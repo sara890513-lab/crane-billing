@@ -464,7 +464,152 @@ function renderMapLink(location){if(!location){$('mapLink').innerHTML='';return}
 $('location').addEventListener('input',()=>renderMapLink($('location').value.trim()));
 function openGoogleMaps(){let q=$('location').value.trim();let u='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q||'台灣');window.open(u,'_blank')}
 function useCurrentLocation(){if(!navigator.geolocation){alert('這個瀏覽器不支援定位功能，請直接輸入地址。');return}navigator.geolocation.getCurrentPosition(pos=>{let lat=pos.coords.latitude,lon=pos.coords.longitude;let u='https://www.google.com/maps/search/?api=1&query='+lat+','+lon;$('location').value=`GPS：${lat.toFixed(6)}, ${lon.toFixed(6)}`;renderMapLink($('location').value);window.open(u,'_blank')},()=>alert('無法取得目前定位。請確認 Safari 已允許此網站使用定位，或直接輸入工作地址。'),{enableHighAccuracy:true,timeout:10000,maximumAge:60000})}
-renderAll();
+
+// ===== Supabase 雲端同步 =====
+const SUPABASE_URL="https://gsyzapkouuvhxfxwztxi.supabase.co";
+const SUPABASE_KEY="sb_publishable_YWrLPsHK5CxaayX0ytEl4A_MdAV1eQ1";
+const API=SUPABASE_URL+"/rest/v1";
+const CLOUD_HEADERS={
+  "apikey":SUPABASE_KEY,
+  "Authorization":"Bearer "+SUPABASE_KEY,
+  "Content-Type":"application/json"
+};
+
+function cloudRecord(r){
+  return {
+    customer:r.customer||"", tax:r.tax||"", date:r.date||null,
+    truck:r.truck||"", location:r.location||"", work:r.work||"",
+    duration:r.duration||"", overtime:Number(r.overtime)||0,
+    amountEx:Number(r.amountEx)||0, taxAmount:Number(r.taxAmount)||0,
+    amountInc:Number(r.amountInc??r.amount)||0,
+    payment:r.payment||"", note:r.note||""
+  };
+}
+function cloudExpense(e){
+  return {date:e.date||null, desc:e.note||e.desc||"", amount:Number(e.amount)||0};
+}
+function fromCloudRecord(r){
+  return {...r,type:"income",amount:Number(r.amountInc)||0};
+}
+function fromCloudExpense(e){
+  return {...e,note:e.desc||""};
+}
+async function apiFetch(path,options={}){
+  const res=await fetch(API+path,{...options,headers:{...CLOUD_HEADERS,...(options.headers||{})}});
+  if(!res.ok){
+    const text=await res.text();
+    throw new Error(text||("HTTP "+res.status));
+  }
+  if(res.status===204) return null;
+  const text=await res.text();
+  return text?JSON.parse(text):null;
+}
+async function loadCloud(){
+  try{
+    const [records,expenses]=await Promise.all([
+      apiFetch("/records?select=*&order=date.desc,created_at.desc"),
+      apiFetch("/expenses?select=*&order=date.desc,created_at.desc")
+    ]);
+
+    // 第一次啟用雲端時：若雲端是空的，自動把這台裝置原本的本機資料搬上去。
+    const localRecords=(state.records||[]).filter(x=>!x.id);
+    const localExpenses=(state.expenses||[]).filter(x=>!x.id);
+    if((records||[]).length===0 && (expenses||[]).length===0 &&
+       (localRecords.length||localExpenses.length)){
+      if(localRecords.length){
+        await apiFetch("/records",{method:"POST",
+          headers:{"Prefer":"return=representation"},
+          body:JSON.stringify(localRecords.map(cloudRecord))});
+      }
+      if(localExpenses.length){
+        await apiFetch("/expenses",{method:"POST",
+          headers:{"Prefer":"return=representation"},
+          body:JSON.stringify(localExpenses.map(cloudExpense))});
+      }
+      return loadCloud();
+    }
+
+    state.records=(records||[]).map(fromCloudRecord);
+    state.expenses=(expenses||[]).map(fromCloudExpense);
+    localStorage.setItem(KEY,JSON.stringify(state)); // 僅作離線備份
+    renderAll();
+  }catch(err){
+    console.error(err);
+    alert("雲端資料讀取失敗，先顯示此裝置的備份資料。\n"+err.message);
+    renderAll();
+  }
+}
+
+addRecord=async function(){
+  updateTax();
+  const ex=round2($('amountEx').value), tax=round2($('taxAmount').value), inc=round2($('amountInc').value);
+  const r={type:'income',customer:$('customer').value.trim(),tax:$('tax').value.trim(),date:$('date').value,
+    truck:$('truck').value,location:$('location').value.trim(),work:$('work').value.trim(),
+    duration:$('duration').value,overtime:Number($('overtime').value)||0,amountEx:ex,taxAmount:tax,
+    amountInc:inc,amount:inc,payment:$('payment').value,note:$('note').value.trim()};
+  if(!r.customer||!r.date||!r.work||!ex){alert('請填寫客戶名稱、日期、工作內容及未稅金額');return}
+  try{
+    if(editIndex>=0 && state.records[editIndex]?.id){
+      const id=state.records[editIndex].id;
+      await apiFetch("/records?id=eq."+encodeURIComponent(id),{method:"PATCH",
+        headers:{"Prefer":"return=minimal"},body:JSON.stringify(cloudRecord(r))});
+    }else{
+      await apiFetch("/records",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify(cloudRecord(r))});
+    }
+    calendarMonth=r.date.slice(0,7); viewMonth=r.date.slice(0,7);
+    resetForm(); await loadCloud();
+  }catch(err){alert("請款資料儲存失敗：\n"+err.message)}
+};
+
+delRecord=async function(i){
+  if(!confirm('確定刪除這筆紀錄？')) return;
+  const r=state.records[i];
+  try{
+    if(r?.id) await apiFetch("/records?id=eq."+encodeURIComponent(r.id),{method:"DELETE"});
+    await loadCloud();
+  }catch(err){alert("刪除失敗：\n"+err.message)}
+};
+
+addExpense=async function(){
+  const date=$('expenseDate').value||today(), note=$('expenseDesc').value.trim();
+  const amount=Number($('expenseAmount').value)||0;
+  if(!date){alert('請選擇支出日期');return}
+  if(!note){alert('請輸入支出項目');return}
+  if(amount<=0){alert('請輸入大於 0 的支出金額');return}
+  try{
+    await apiFetch("/expenses",{method:"POST",headers:{"Prefer":"return=minimal"},
+      body:JSON.stringify({date,desc:note,amount})});
+    clearExpenseForm(); viewMonth=date.slice(0,7); calendarMonth=viewMonth;
+    await loadCloud();
+  }catch(err){alert("支出儲存失敗：\n"+err.message)}
+};
+
+editExpense=async function(i){
+  const e=state.expenses[i]; if(!e)return;
+  const date=prompt('支出日期（YYYY-MM-DD）',e.date||today()); if(!date)return;
+  const amount=Number(prompt('支出金額',String(e.amount||0))||0); if(!amount)return;
+  const note=prompt('支出項目／備註',e.note||e.desc||'其他支出')||'其他支出';
+  try{
+    if(e.id){
+      await apiFetch("/expenses?id=eq."+encodeURIComponent(e.id),{method:"PATCH",
+        headers:{"Prefer":"return=minimal"},body:JSON.stringify({date,desc:note,amount})});
+    }
+    await loadCloud();
+  }catch(err){alert("支出修改失敗：\n"+err.message)}
+};
+
+delExpense=async function(i){
+  if(!confirm('確定刪除這筆支出？'))return;
+  const e=state.expenses[i];
+  try{
+    if(e?.id) await apiFetch("/expenses?id=eq."+encodeURIComponent(e.id),{method:"DELETE"});
+    await loadCloud();
+  }catch(err){alert("支出刪除失敗：\n"+err.message)}
+};
+
+// 開啟網頁時，以 Supabase 為主資料來源。
+loadCloud();
+
 </script>
 </body>
 </html>
