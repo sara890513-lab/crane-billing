@@ -245,6 +245,7 @@ let editIndex=-1;
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem(KEY,JSON.stringify(state));renderAll()}
 function today(){return new Date().toISOString().slice(0,10)}
+let selectedDay=today();
 $("date").value=today();
 $("expenseDate").value=today();
 function resetForm(){
@@ -321,21 +322,15 @@ function renderFinance(){
   state.expenses=state.expenses||[];
   const scope=window.financeScope||'month';
   const now=new Date(), ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const incomes=state.records.filter(r=>scope==='all'||String(r.date||'').startsWith(ym));
-  const expenses=state.expenses.filter(e=>scope==='all'||String(e.date||'').startsWith(ym));
-  const rows=[
-    ...incomes.map(r=>({date:r.date||'',label:`${r.customer||'未填客戶'}｜${r.work||'工作'}`,amount:financeAmount(r),type:'in'})),
-    ...expenses.map((e,index)=>({date:e.date||'',label:e.note||'支出',amount:expenseAmount(e),type:'out',index}))
-  ].sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-  $('financeList').innerHTML=rows.length?rows.map(x=>{
-    const controls=x.type==='out'
-      ? `<span class="print-hide" style="white-space:nowrap;margin-left:6px"><button class="light" style="padding:5px 8px;font-size:12px" onclick="editExpense(${x.index})">編輯</button> <button class="danger" style="padding:5px 8px;font-size:12px" onclick="delExpense(${x.index})">刪除</button></span>`
-      : '';
-    return `<div class="finance-row"><span>${x.date}<br>${esc(x.label)}</span><span><b class="${x.type==='in'?'finance-in':'finance-out'}">${x.type==='in'?'+':'-'}${money(x.amount)}</b>${controls}</span></div>`;
-  }).join(''):'<div class="muted">目前沒有收支紀錄</div>';
-  const income=rows.filter(x=>x.type==='in').reduce((s,x)=>s+x.amount,0);
-  const expense=rows.filter(x=>x.type==='out').reduce((s,x)=>s+x.amount,0);
-  $('financeTotal').innerHTML=`<span>收入 ${money(income)}｜支出 ${money(expense)}</span><span>結餘 ${money(income-expense)}</span>`;
+  const expenses=state.expenses
+    .map((e,index)=>({...e,_index:index}))
+    .filter(e=>scope==='all'||String(e.date||'').startsWith(ym))
+    .sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  $('financeList').innerHTML=expenses.length?expenses.map(e=>{
+    return `<div class="finance-row"><span>${esc(e.date||'')}<br>${esc(e.note||e.desc||'支出')}</span><span><b class="finance-out">-${money(expenseAmount(e))}</b><span class="print-hide" style="white-space:nowrap;margin-left:6px"><button class="light" style="padding:5px 8px;font-size:12px" onclick="editExpense(${e._index})">編輯</button> <button class="danger" style="padding:5px 8px;font-size:12px" onclick="delExpense(${e._index})">刪除</button></span></span></div>`;
+  }).join(''):'<div class="muted">目前沒有支出紀錄</div>';
+  const expense=expenses.reduce((s,e)=>s+expenseAmount(e),0);
+  $('financeTotal').innerHTML=`<span>支出合計</span><span>${money(expense)}</span>`;
 }
 
 
@@ -380,12 +375,10 @@ function renderCalendar(){
     }
     const isToday=ds===today();
     let items=recs.map(r=>{
-      const ri=state.records.indexOf(r);
-      return `<div class="cal-item"><div class="customer-name">${esc(r.customer||'未填客戶')}</div><div>${calendarMoney(financeAmount(r))}</div><div class="calendar-no-print"><button class="light" style="padding:2px 5px;font-size:9px" onclick="editRecord(${ri})">編輯</button></div></div>`;
+      return `<div class="cal-item"><div class="customer-name">${esc(r.customer||'未填客戶')}</div><div>${calendarMoney(financeAmount(r))}</div></div>`;
     }).join('');
     exps.forEach(e=>{
-      const ei=state.expenses.indexOf(e);
-      items+=`<div class="cal-expense">今日支出 ${calendarMoney(expenseAmount(e))}<br>${esc(e.note||'支出')}<div class="calendar-no-print"><button class="light" style="padding:2px 5px;font-size:9px" onclick="editExpense(${ei})">編輯</button> <button class="danger" style="padding:2px 5px;font-size:9px" onclick="delExpense(${ei})">刪除</button></div></div>`;
+      items+=`<div class="cal-expense">今日支出 ${calendarMoney(expenseAmount(e))}<br>${esc(e.note||'支出')}</div>`;
     });
     out+=`<div class="cal-day ${other?'other':''} ${isToday?'today':''}">
       <div class="cal-num">${dayNum}</div>${items||''}
@@ -402,7 +395,27 @@ function exportCalendar(){
   setTimeout(()=>document.title=oldTitle,500);
 }
 
-function updateDashboard(){const inc=state.records.filter(r=>r.date.slice(0,7)===viewMonth).reduce((a,r)=>a+financeAmount(r),0);const exp=state.expenses.filter(e=>e.date.slice(0,7)===viewMonth).reduce((a,e)=>a+expenseAmount(e),0);$('dashIncome').textContent=money(inc);$('dashExpense').textContent=money(exp);$('dashBalance').textContent=money(inc-exp);$('dashJobs').textContent=state.records.filter(r=>r.date.slice(0,7)===viewMonth).length+' 筆';const td=today();$('todayDateLabel').textContent=td;const recs=state.records.filter(r=>r.date===td),exps=(state.expenses||[]).filter(e=>e.date===td);let out=recs.map(r=>`<div class="today-job"><div class="today-job-main"><b>${esc(r.customer||'未填客戶')}</b><span>${esc(r.location||'未填地點')}</span></div><strong>${money(financeAmount(r))}</strong></div>`).join('');out+=exps.map(e=>`<div class="today-job expense-row"><div class="today-job-main"><b>今日支出</b><span>${esc(e.note||'支出')}</span></div><strong>${money(expenseAmount(e))}</strong></div>`).join('');$('todayWorkList').innerHTML=out||'<div class="today-empty">今天尚未登錄工作或支出</div>'}
+function updateDashboard(){
+  const inc=state.records.filter(r=>String(r.date||'').slice(0,7)===viewMonth).reduce((a,r)=>a+financeAmount(r),0);
+  const exp=(state.expenses||[]).filter(e=>String(e.date||'').slice(0,7)===viewMonth).reduce((a,e)=>a+expenseAmount(e),0);
+  $('dashIncome').textContent=money(inc);
+  $('dashExpense').textContent=money(exp);
+  $('dashBalance').textContent=money(inc-exp);
+  $('dashJobs').textContent=state.records.filter(r=>String(r.date||'').slice(0,7)===viewMonth).length+' 筆';
+  const td=today();
+  $('todayDateLabel').textContent=td;
+  const recs=state.records.filter(r=>r.date===td);
+  const exps=(state.expenses||[]).filter(e=>e.date===td);
+  let out=recs.map(r=>{
+    const ri=state.records.indexOf(r);
+    return `<div class="today-job"><div class="today-job-main"><b>${esc(r.customer||'未填客戶')}</b><span>${esc(r.location||'未填地點')}</span><span class="print-hide"><button class="light" style="padding:5px 8px;font-size:12px" onclick="editRecord(${ri})">編輯</button> <button class="danger" style="padding:5px 8px;font-size:12px" onclick="delRecord(${ri})">刪除</button></span></div><strong>${money(financeAmount(r))}</strong></div>`;
+  }).join('');
+  out+=exps.map(e=>{
+    const ei=state.expenses.indexOf(e);
+    return `<div class="today-job expense-row"><div class="today-job-main"><b>今日支出</b><span>${esc(e.note||e.desc||'支出')}</span><span class="print-hide"><button class="light" style="padding:5px 8px;font-size:12px" onclick="editExpense(${ei})">編輯</button> <button class="danger" style="padding:5px 8px;font-size:12px" onclick="delExpense(${ei})">刪除</button></span></div><strong>${money(expenseAmount(e))}</strong></div>`;
+  }).join('');
+  $('todayWorkList').innerHTML=out||'<div class="today-empty">今天尚未登錄工作或支出</div>';
+}
 function renderAll(){renderStats();renderRecords();renderCustomers();renderFinance();renderCalendar();updateDashboard()}
 function renderStats(){
   const monthRecords=state.records.filter(r=>String(r.date||'').slice(0,7)===viewMonth);
