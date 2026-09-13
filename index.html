@@ -212,6 +212,93 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
 
 </style>
 
+
+<style>
+/* ===== 每月工作：A4 直式單頁匯出 ===== */
+.calendar-export-sheet{
+  width:794px;
+  height:1123px;
+  min-height:1123px;
+  padding:30px 32px 26px;
+  box-sizing:border-box;
+  overflow:hidden;
+  background:#fff;
+  color:#151515;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",Arial,sans-serif;
+}
+.calendar-export-sheet *{box-sizing:border-box}
+.calendar-export-head{
+  display:grid;
+  grid-template-columns:84px 1fr auto;
+  align-items:center;
+  gap:14px;
+  margin-bottom:8px;
+}
+.calendar-export-icon{font-size:58px;line-height:1;text-align:center}
+.calendar-export-company{font-size:29px;font-weight:900;letter-spacing:2px;line-height:1.1}
+.calendar-export-slogan{font-size:12px;font-weight:700;letter-spacing:5px;margin-top:6px}
+.calendar-export-monthbox{text-align:right}
+.calendar-export-label{font-size:17px;font-weight:800}
+.calendar-export-month{font-size:27px;font-weight:900;margin-top:3px}
+.calendar-export-help{
+  font-size:12px;color:#666;margin:8px 0 10px;line-height:1.4
+}
+.calendar-export-week,
+.calendar-export-grid{
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:5px;
+  min-width:0!important;
+  width:100%!important;
+}
+.calendar-export-week{margin-bottom:5px}
+.calendar-export-week div{
+  background:#f1f2f4;
+  border-radius:7px;
+  padding:7px 2px;
+  font-size:13px;
+  font-weight:900;
+  text-align:center;
+}
+.calendar-export-day{
+  min-width:0!important;
+  border:1px solid #d7dadd;
+  border-radius:7px;
+  padding:7px 6px;
+  overflow:hidden;
+  background:#fff;
+}
+.calendar-export-day.other{background:#f7f7f7;color:#999}
+.calendar-export-day.today{border:2px solid #555}
+.calendar-export-num{font-size:14px;font-weight:900;margin-bottom:4px}
+.calendar-export-job{
+  background:#f5f6f7;border-radius:5px;padding:4px 5px;margin:3px 0;
+  font-size:10px;line-height:1.28;font-weight:700;word-break:break-word;
+}
+.calendar-export-expense{
+  background:#fff0f0;color:#d11;border-radius:5px;padding:4px 5px;margin:3px 0;
+  font-size:10px;line-height:1.28;font-weight:800;word-break:break-word;
+}
+.calendar-export-summary{
+  margin-top:12px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  background:#f4f5f6;
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:14px;
+  font-weight:700;
+}
+.calendar-export-summary b{font-size:16px}
+.calendar-export-date{
+  text-align:right;
+  color:#666;
+  font-size:10px;
+  margin-top:10px;
+}
+</style>
+
 </head>
 <body>
 <header class="topbar">
@@ -280,7 +367,8 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
       <button class="light" onclick="changeCalendarMonth(-1)">← 上月</button>
       <button class="light" onclick="goCalendarToday()">今天</button>
       <button class="light" onclick="changeCalendarMonth(1)">下月 →</button>
-      <button class="primary" onclick="exportCalendar()">📄 匯出行事曆</button>
+      <button class="primary" onclick="exportCalendarPDF()">📄 匯出 PDF</button>
+      <button class="light" onclick="exportCalendarPNG()">🖼️ 匯出圖檔</button>
     </div>
   </div>
   <div id="calendarTitle" style="font-size:18px;font-weight:800;margin-bottom:8px"></div>
@@ -291,6 +379,7 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
   <div id="calendarSummary" class="calendar-summary"></div>
 </section>
 
+<div id="calendarExportPrint" style="display:none"></div>
 
 <section class="finance-card" id="expenses">
   <div class="finance-head">
@@ -519,11 +608,120 @@ function renderCalendar(){
   $('calendarSummary').innerHTML=`本月請款 <b>${calendarMoney(monthIncome)}</b>　｜　今日／本月支出 <b>${calendarMoney(monthExpense)}</b>　｜　結餘 <b>${calendarMoney(monthIncome-monthExpense)}</b>`;
 }
 
-function exportCalendar(){
-  const oldTitle=document.title;
-  document.title=`每月工作行事曆_${calendarMonth}`;
-  window.print();
-  setTimeout(()=>document.title=oldTitle,500);
+function buildCalendarExportSheet(){
+  const [y,m]=calendarMonth.split('-').map(Number);
+  const first=new Date(y,m-1,1);
+  const start=(first.getDay()+6)%7;
+  const days=new Date(y,m,0).getDate();
+  const prevDays=new Date(y,m-1,0).getDate();
+  const cells=Math.ceil((start+days)/7)*7;
+  const rows=cells/7;
+  const dayHeight=rows===6?116:140;
+  const names=['一','二','三','四','五','六','日'];
+  let monthIncome=0,monthExpense=0;
+  let grid='';
+
+  for(let i=0;i<cells;i++){
+    let dayNum=i-start+1, yy=y, mm=m, other=false;
+    if(dayNum<1){dayNum=prevDays+dayNum;mm=m-1;if(mm<1){mm=12;yy--}other=true}
+    else if(dayNum>days){dayNum=dayNum-days;mm=m+1;if(mm>12){mm=1;yy++}other=true}
+    const ds=`${yy}-${String(mm).padStart(2,'0')}-${String(dayNum).padStart(2,'0')}`;
+    const recs=state.records.filter(r=>r.date===ds);
+    const exps=(state.expenses||[]).filter(e=>e.date===ds);
+
+    if(ds.slice(0,7)===calendarMonth){
+      monthIncome+=recs.reduce((s,r)=>s+financeAmount(r),0);
+      monthExpense+=exps.reduce((s,e)=>s+expenseAmount(e),0);
+    }
+
+    let items=recs.map(r=>`<div class="calendar-export-job">${esc(r.customer||'未填客戶')}<br>${calendarMoney(financeAmount(r))}</div>`).join('');
+    items+=exps.map(e=>`<div class="calendar-export-expense">今日支出<br>${calendarMoney(expenseAmount(e))}<br>${esc(e.note||e.desc||'支出')}</div>`).join('');
+
+    grid+=`<div class="calendar-export-day ${other?'other':''} ${ds===today()?'today':''}" style="height:${dayHeight}px">
+      <div class="calendar-export-num">${dayNum}</div>${items}
+    </div>`;
+  }
+
+  const target=$('calendarExportPrint');
+  target.innerHTML=`
+    <div class="calendar-export-sheet">
+      <div class="calendar-export-head">
+        <div class="calendar-export-icon">🏗️</div>
+        <div>
+          <div class="calendar-export-company">逢勝起重工程行</div>
+          <div class="calendar-export-slogan">專業・安全・效率・服務</div>
+        </div>
+        <div class="calendar-export-monthbox">
+          <div class="calendar-export-label">每月工作</div>
+          <div class="calendar-export-month">${y} 年 ${m} 月</div>
+        </div>
+      </div>
+      <div class="calendar-export-help">新增請款後，會依「日期」自動出現在這個月的工作行事曆；每天可直接看到客戶及含稅金額。</div>
+      <div class="calendar-export-week">${names.map(n=>`<div>${n}</div>`).join('')}</div>
+      <div class="calendar-export-grid">${grid}</div>
+      <div class="calendar-export-summary">
+        <span>本月請款 <b>${calendarMoney(monthIncome)}</b></span>
+        <span>今日／本月支出 <b>${calendarMoney(monthExpense)}</b></span>
+        <span>結餘 <b>${calendarMoney(monthIncome-monthExpense)}</b></span>
+      </div>
+      <div class="calendar-export-date">${new Date().toLocaleString('zh-TW')}　頁面 1/1</div>
+    </div>`;
+  return target.querySelector('.calendar-export-sheet');
+}
+
+async function prepareCalendarCanvas(){
+  if(typeof html2canvas==='undefined'){
+    alert('匯出工具尚未載入完成，請確認網路連線後重新整理再試一次。');
+    return null;
+  }
+  const wrap=$('calendarExportPrint');
+  const sheet=buildCalendarExportSheet();
+  const old={display:wrap.style.display,position:wrap.style.position,left:wrap.style.left,top:wrap.style.top};
+  wrap.style.display='block';
+  wrap.style.position='fixed';
+  wrap.style.left='-10000px';
+  wrap.style.top='0';
+  try{
+    return await html2canvas(sheet,{
+      backgroundColor:'#ffffff',
+      scale:2,
+      width:794,
+      height:1123,
+      windowWidth:794,
+      windowHeight:1123,
+      useCORS:true,
+      logging:false
+    });
+  }catch(err){
+    console.error(err);
+    alert('行事曆產生失敗，請重新整理後再試一次。');
+    return null;
+  }finally{
+    Object.assign(wrap.style,old);
+  }
+}
+
+async function exportCalendarPDF(){
+  const canvas=await prepareCalendarCanvas();
+  if(!canvas)return;
+  if(!window.jspdf?.jsPDF){alert('PDF 工具尚未載入完成，請重新整理後再試一次。');return}
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const pageW=210,pageH=297,margin=5;
+  const usableW=pageW-margin*2,usableH=pageH-margin*2;
+  const scale=Math.min(usableW/canvas.width,usableH/canvas.height);
+  const w=canvas.width*scale,h=canvas.height*scale;
+  pdf.addImage(canvas.toDataURL('image/jpeg',0.97),'JPEG',(pageW-w)/2,(pageH-h)/2,w,h);
+  await shareOrDownloadBlob(pdf.output('blob'),`每月工作_${calendarMonth}.pdf`,'application/pdf');
+}
+
+async function exportCalendarPNG(){
+  const canvas=await prepareCalendarCanvas();
+  if(!canvas)return;
+  canvas.toBlob(async blob=>{
+    if(!blob){alert('圖檔產生失敗，請重新整理後再試一次。');return}
+    await shareOrDownloadBlob(blob,`每月工作_${calendarMonth}.png`,'image/png');
+  },'image/png',1);
 }
 
 function updateDashboard(){
