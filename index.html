@@ -88,6 +88,115 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<style>
+/* ===== 客戶帳本 A4 直式匯出版 ===== */
+#customerLedgerPrint{
+  display:none;
+  background:#fff;
+  color:#111;
+}
+.customer-a4-sheet{
+  width:794px;            /* 約 A4 直式 96dpi */
+  min-height:1123px;
+  margin:0 auto;
+  padding:34px 30px 28px;
+  background:#fff;
+  color:#111;
+  font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",Arial,sans-serif;
+  box-sizing:border-box;
+}
+.customer-a4-header{
+  display:grid;
+  grid-template-columns:120px 1fr auto;
+  align-items:end;
+  gap:14px;
+  padding-bottom:12px;
+  border-bottom:2px solid #222;
+}
+.customer-a4-crane{
+  font-size:72px;
+  line-height:1;
+  text-align:center;
+}
+.customer-a4-company{
+  font-size:34px;
+  font-weight:900;
+  letter-spacing:2px;
+  line-height:1.15;
+}
+.customer-a4-slogan{
+  margin-top:7px;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:7px;
+}
+.customer-a4-title{
+  font-size:27px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.customer-a4-info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px 20px;
+  margin:18px 2px 15px;
+  font-size:14px;
+  line-height:1.65;
+}
+.customer-a4-info .right{text-align:right}
+.customer-a4-table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:12px;
+}
+.customer-a4-table th,
+.customer-a4-table td{
+  border:1px solid #666;
+  padding:7px 6px;
+  vertical-align:middle;
+  word-break:break-word;
+}
+.customer-a4-table th{
+  background:#f0f0f0;
+  text-align:center;
+  font-weight:800;
+}
+.customer-a4-table .money{text-align:right;white-space:nowrap}
+.customer-a4-empty td{height:34px}
+.customer-a4-totals{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:-1px;
+  font-size:13px;
+}
+.customer-a4-totals td{
+  border:1px solid #666;
+  padding:8px 10px;
+}
+.customer-a4-totals .label{font-weight:800;width:52%}
+.customer-a4-totals .value{text-align:right}
+.customer-a4-note{
+  display:grid;
+  grid-template-columns:100px 1fr;
+  min-height:70px;
+  border:1px solid #666;
+  border-top:0;
+  font-size:13px;
+}
+.customer-a4-note .label{
+  padding:12px 10px;
+  font-weight:800;
+  border-right:1px solid #666;
+}
+.customer-a4-note .space{padding:12px}
+@media(max-width:850px){
+  .customer-ledger-preview-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
+  .customer-a4-sheet{transform-origin:top left}
+}
+</style>
+
 </head>
 <body>
 <header class="topbar">
@@ -478,24 +587,77 @@ function buildCustomerLedger(name){
   const taxNo=(getCustomerRecords(name)[0]?.tax)||'';
   $('customerLedgerTitle').textContent='👤 '+name+'｜客戶帳本';
   $('customerLedgerSummary').innerHTML=`期間：${esc(ledgerPeriodText())}　｜　共 ${arr.length} 筆　｜　未稅 ${money(exTotal)}　｜　稅額 ${money(txTotal)}　｜　含稅 <b>${money(total)}</b>`;
-  const rows=arr.map(r=>`<tr><td>${esc(r.date||'')}</td><td>${esc((r.work||'')+(r.location?'／'+r.location:''))}</td><td>${esc(ledgerTimeText(r)||'—')}</td><td>${esc(r.truck||'—')}</td><td style="text-align:right">${money(r.amountEx??0)}</td><td>${esc(r.note||'')}</td></tr>`).join('');
-  const emptyRow=arr.length?'':`<tr><td colspan="6" style="text-align:center;padding:24px">這個日期區間沒有帳目</td></tr>`;
+
+  const rows=arr.map(r=>`
+    <tr>
+      <td>${esc(r.date||'')}</td>
+      <td>${esc((r.work||'')+(r.location?'／'+r.location:''))}</td>
+      <td>${esc(ledgerTimeText(r)||'—')}</td>
+      <td>${esc(r.truck||'—')}</td>
+      <td class="money">${money(r.amountEx??0)}</td>
+      <td>${esc(r.note||'')}</td>
+    </tr>`).join('');
+
+  const blankCount=Math.max(0,12-arr.length);
+  const blankRows=Array.from({length:blankCount},()=>`
+    <tr class="customer-a4-empty">
+      <td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td>
+    </tr>`).join('');
+
   $('customerLedgerPrint').innerHTML=`
-    <div style="font-family:Arial,'Noto Sans TC',sans-serif;color:#222;background:#fff;padding:8px 4px">
-      <div style="text-align:center;font-size:28px;font-weight:800;margin-bottom:6px">逢勝起重工程行 報價／請款帳本</div>
-      <div style="display:flex;justify-content:space-between;gap:20px;margin:10px 0 16px;font-size:16px">
-        <div><b>客戶：</b>${esc(name)}<br><b>統編：</b>${esc(taxNo||'—')}</div>
-        <div style="text-align:right"><b>帳目期間：</b>${esc(ledgerPeriodText())}<br><b>匯出日期：</b>${new Date().toLocaleDateString('zh-TW')}</div>
+    <div class="customer-a4-sheet">
+      <div class="customer-a4-header">
+        <div class="customer-a4-crane">🏗️</div>
+        <div>
+          <div class="customer-a4-company">逢勝起重工程行</div>
+          <div class="customer-a4-slogan">專業・安全・效率・服務</div>
+        </div>
+        <div class="customer-a4-title">報價 / 請款帳本</div>
       </div>
-      <table class="ledger-table" style="table-layout:fixed;width:100%;font-size:14px">
-        <thead><tr><th style="width:13%">日期</th><th style="width:31%">工作內容／地點</th><th style="width:16%">時間</th><th style="width:12%">車種</th><th style="width:14%;text-align:right">未稅金額</th><th style="width:14%">備註</th></tr></thead>
-        <tbody>${rows}${emptyRow}</tbody>
+
+      <div class="customer-a4-info">
+        <div>
+          <div><b>客戶名稱：</b>${esc(name)}</div>
+          <div><b>統　　編：</b>${esc(taxNo||'—')}</div>
+          <div><b>帳目期間：</b>${esc(ledgerPeriodText())}</div>
+        </div>
+        <div class="right">
+          <div style="margin-top:34px"><b>匯出日期：</b>${new Date().toLocaleDateString('zh-TW')}</div>
+        </div>
+      </div>
+
+      <table class="customer-a4-table">
+        <colgroup>
+          <col style="width:14%">
+          <col style="width:31%">
+          <col style="width:12%">
+          <col style="width:13%">
+          <col style="width:15%">
+          <col style="width:15%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>工作內容 / 地點</th>
+            <th>時間</th>
+            <th>車種</th>
+            <th>未稅金額</th>
+            <th>備註</th>
+          </tr>
+        </thead>
+        <tbody>${rows}${blankRows}</tbody>
       </table>
-      <table style="width:48%;margin:18px 0 0 auto;border-collapse:collapse;font-size:15px">
-        <tr><td style="border:1px solid #bbb;padding:8px">小計</td><td style="border:1px solid #bbb;padding:8px;text-align:right">${money(exTotal)}</td></tr>
-        <tr><td style="border:1px solid #bbb;padding:8px">稅金 5%</td><td style="border:1px solid #bbb;padding:8px;text-align:right">${money(txTotal)}</td></tr>
-        <tr><td style="border:1px solid #bbb;padding:8px;font-weight:800">合計</td><td style="border:1px solid #bbb;padding:8px;text-align:right;font-weight:800">${money(total)}</td></tr>
+
+      <table class="customer-a4-totals">
+        <tr><td class="label">小計</td><td class="value">${money(exTotal)}</td></tr>
+        <tr><td class="label">稅金 5%</td><td class="value">${money(txTotal)}</td></tr>
+        <tr><td class="label">合計</td><td class="value"><b>${money(total)}</b></td></tr>
       </table>
+
+      <div class="customer-a4-note">
+        <div class="label">備註</div>
+        <div class="space"></div>
+      </div>
     </div>`;
 }
 function showCustomer(name){
@@ -522,16 +684,33 @@ async function prepareCustomerLedgerCanvas(){
     return null;
   }
   const source=$('customerLedgerPrint');
-  const old={display:source.style.display,position:source.style.position,left:source.style.left,top:source.style.top,width:source.style.width,background:source.style.background,padding:source.style.padding};
+  const sheet=source.querySelector('.customer-a4-sheet');
+  const old={
+    display:source.style.display,position:source.style.position,left:source.style.left,
+    top:source.style.top,width:source.style.width,height:source.style.height,
+    background:source.style.background,padding:source.style.padding
+  };
   source.style.display='block';
   source.style.position='fixed';
   source.style.left='-10000px';
   source.style.top='0';
-  source.style.width='1100px';
+  source.style.width='794px';
+  source.style.height='1123px';
   source.style.background='#fff';
-  source.style.padding='28px';
+  source.style.padding='0';
+  sheet.style.width='794px';
+  sheet.style.minHeight='1123px';
   try{
-    const canvas=await html2canvas(source,{backgroundColor:'#ffffff',scale:2,useCORS:true,logging:false});
+    const canvas=await html2canvas(sheet,{
+      backgroundColor:'#ffffff',
+      scale:2,
+      width:794,
+      height:1123,
+      windowWidth:794,
+      windowHeight:1123,
+      useCORS:true,
+      logging:false
+    });
     return canvas;
   }catch(err){
     console.error(err);
@@ -556,21 +735,15 @@ async function exportCustomerPDF(){
   if(!canvas)return;
   if(!window.jspdf?.jsPDF){alert('PDF 工具尚未載入完成，請重新整理後再試一次。');return}
   const {jsPDF}=window.jspdf;
-  const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
-  const pageW=210,pageH=297,margin=8,usableW=pageW-margin*2,usableH=pageH-margin*2;
-  const imgW=usableW;
-  const ratio=imgW/canvas.width;
-  const slicePx=Math.floor(usableH/ratio);
-  let yPx=0,page=0;
-  while(yPx<canvas.height){
-    const hPx=Math.min(slicePx,canvas.height-yPx);
-    const part=document.createElement('canvas');part.width=canvas.width;part.height=hPx;
-    part.getContext('2d').drawImage(canvas,0,yPx,canvas.width,hPx,0,0,canvas.width,hPx);
-    if(page>0)pdf.addPage();
-    const partH=hPx*ratio;
-    pdf.addImage(part.toDataURL('image/jpeg',0.96),'JPEG',margin,margin,imgW,partH);
-    yPx+=hPx;page++;
-  }
+  const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const pageW=210,pageH=297,margin=6;
+  const usableW=pageW-margin*2,usableH=pageH-margin*2;
+  const scale=Math.min(usableW/canvas.width,usableH/canvas.height);
+  const imgW=canvas.width*scale;
+  const imgH=canvas.height*scale;
+  const x=(pageW-imgW)/2;
+  const y=(pageH-imgH)/2;
+  pdf.addImage(canvas.toDataURL('image/jpeg',0.96),'JPEG',x,y,imgW,imgH);
   const blob=pdf.output('blob');
   await shareOrDownloadBlob(blob,`${filterCustomer}_客戶帳本_${ledgerPeriodText().replace(/\s/g,'')}.pdf`,'application/pdf');
 }
