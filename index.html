@@ -415,9 +415,9 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
 
 <section class="card manage-card" id="customers">
 <h2>客戶帳本</h2>
-<div class="customer-search print-hide"><input id="customerSearch" placeholder="🔍 輸入客戶名稱或統編搜尋帳本" oninput="renderCustomers()" onkeydown="if(event.key==='Enter') searchCustomerLedger()"><button class="primary" onclick="searchCustomerLedger()">搜尋帳本</button><button class="light" onclick="clearCustomerSearch()">清除</button></div>
-<div class="search-hint muted">可輸入完整或部分「客戶名稱／統編」，搜尋後點「查看帳本」即可查看該客戶全部請款紀錄。</div>
-<div id="customersList" class="customer-list" style="margin-top:10px"></div>
+<div class="customer-search print-hide"><input id="customerSearch" placeholder="🔍 輸入客戶名稱或統編搜尋帳本" onkeydown="if(event.key==='Enter') searchCustomerLedger()"><button class="primary" onclick="searchCustomerLedger()">搜尋帳本</button><button class="light" onclick="clearCustomerSearch()">清除</button></div>
+<div class="search-hint muted">平常不顯示全部客戶。輸入客戶名稱或統編後按「搜尋帳本」，才會顯示符合的客戶資料。</div>
+<div id="customersList" class="customer-list" style="margin-top:10px"><div class="empty">請先輸入客戶名稱或統編搜尋</div></div>
 <div id="customerLedgerPanel" class="customer-ledger" style="display:none">
   <h3 id="customerLedgerTitle">客戶帳本</h3>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">
@@ -435,7 +435,13 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
 <div id="customerLedgerPrint"></div>
 
 <section class="card" id="recordsSection">
-<h2 id="recordsTitle">請款紀錄</h2>
+<div class="section-head" style="align-items:end;gap:12px;flex-wrap:wrap">
+  <h2 id="recordsTitle" style="margin:0">請款紀錄</h2>
+  <div class="print-hide" style="margin-left:auto;min-width:190px">
+    <label for="recordsMonthSelect" style="display:block;margin-bottom:5px">選擇月份</label>
+    <input id="recordsMonthSelect" type="month" onchange="changeRecordsMonth(this.value)">
+  </div>
+</div>
 <div class="table-wrap"><table><thead><tr><th>日期</th><th>客戶</th><th>統編</th><th>地點</th><th>工作內容</th><th>時間</th><th>加班</th><th>車種</th><th>未稅</th><th>稅額5%</th><th>含稅</th><th>收款方式</th><th>備註</th><th class="print-hide">操作</th></tr></thead>
 <tbody id="records"></tbody></table><div id="empty" class="empty">目前沒有紀錄</div></div>
 <div class="total">含稅合計：<span id="total">$0</span></div>
@@ -758,10 +764,46 @@ function renderStats(){
   $('monthExpense').textContent=money(exp);
   $('monthBalance').textContent=money(inc-exp);
 }
-function renderRecords(){let arr=monthRecords();$('recordsTitle').textContent=(filterCustomer?filterCustomer+'｜':'')+'請款紀錄（'+viewMonth+'）';$('empty').style.display=arr.length?'none':'block';$('records').innerHTML=arr.map(r=>{let i=state.records.indexOf(r);let ex=r.amountEx??round2((Number(r.amount)||0)/1.05);let tx=r.taxAmount??round2((Number(r.amount)||0)-ex);let inc=r.amountInc??r.amount??0;return `<tr><td>${esc(r.date)}</td><td>${esc(r.customer)}</td><td>${esc(r.tax)}</td><td>${r.location?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.location)}" target="_blank" rel="noopener">${esc(r.location)}</a>`:'—'}</td><td>${esc(r.work)}</td><td>${esc(r.duration)}</td><td>${r.overtime?esc(r.overtime)+' 小時':'—'}</td><td>${esc(r.truck)}</td><td>${money(ex)}</td><td>${money(tx)}</td><td><b>${money(inc)}</b></td><td><span class="badge">${esc(r.payment||'未設定')}</span></td><td>${esc(r.note)}</td><td class="print-hide"><button class="light" onclick="editRecord(${i})">修改</button> <button class="danger" onclick="delRecord(${i})">刪除</button></td></tr>`}).join('');$('total').textContent=money(arr.reduce((a,r)=>a+(Number(r.amountInc??r.amount)||0),0))}
-function renderCustomers(){let q=$('customerSearch').value.trim().toLowerCase();let map={};state.records.forEach(r=>{if(q&&!((r.customer+' '+r.tax).toLowerCase().includes(q)))return;if(!map[r.customer])map[r.customer]={tax:r.tax,total:0,count:0};map[r.customer].total+=Number(r.amountInc??r.amount)||0;map[r.customer].count++});let arr=Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0],'zh-Hant'));$('customersList').innerHTML=arr.length?arr.map(([name,x])=>`<div class="customer"><div><strong>${esc(name)}</strong><div class="muted">統編：${esc(x.tax||'—')}　共 ${x.count} 筆　累計含稅 ${money(x.total)}</div></div><button class="light" onclick='showCustomer(${JSON.stringify(name)})'>查看帳本</button></div>`).join(''):'<div class="empty">尚無客戶資料</div>'}
-function searchCustomerLedger(){const q=$('customerSearch').value.trim().toLowerCase();renderCustomers();if(!q){alert('請輸入客戶名稱或統編');return}const matches=state.records.filter(r=>((r.customer||'')+' '+(r.tax||'')).toLowerCase().includes(q));const names=[...new Set(matches.map(r=>r.customer).filter(Boolean))];if(names.length===1){showCustomer(names[0]);}else if(names.length===0){alert('找不到符合的客戶或統編');}else{$('customersList').scrollIntoView({behavior:'smooth',block:'start'});}}
-function clearCustomerSearch(){$('customerSearch').value='';filterCustomer='';$('customerLedgerPanel').style.display='none';$('customerLedgerPrint').innerHTML='';renderCustomers();renderRecords()}
+function changeRecordsMonth(month){
+  if(!month)return;
+  viewMonth=month;
+  filterCustomer='';
+  renderRecords();
+}
+function renderRecords(){if($('recordsMonthSelect'))$('recordsMonthSelect').value=viewMonth;let arr=monthRecords();$('recordsTitle').textContent=(filterCustomer?filterCustomer+'｜':'')+'請款紀錄（'+viewMonth+'）';$('empty').style.display=arr.length?'none':'block';$('records').innerHTML=arr.map(r=>{let i=state.records.indexOf(r);let ex=r.amountEx??round2((Number(r.amount)||0)/1.05);let tx=r.taxAmount??round2((Number(r.amount)||0)-ex);let inc=r.amountInc??r.amount??0;return `<tr><td>${esc(r.date)}</td><td>${esc(r.customer)}</td><td>${esc(r.tax)}</td><td>${r.location?`<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.location)}" target="_blank" rel="noopener">${esc(r.location)}</a>`:'—'}</td><td>${esc(r.work)}</td><td>${esc(r.duration)}</td><td>${r.overtime?esc(r.overtime)+' 小時':'—'}</td><td>${esc(r.truck)}</td><td>${money(ex)}</td><td>${money(tx)}</td><td><b>${money(inc)}</b></td><td><span class="badge">${esc(r.payment||'未設定')}</span></td><td>${esc(r.note)}</td><td class="print-hide"><button class="light" onclick="editRecord(${i})">修改</button> <button class="danger" onclick="delRecord(${i})">刪除</button></td></tr>`}).join('');$('total').textContent=money(arr.reduce((a,r)=>a+(Number(r.amountInc??r.amount)||0),0))}
+function renderCustomers(forceSearch=false){
+  const box=$('customersList');
+  const q=$('customerSearch').value.trim().toLowerCase();
+  if(!forceSearch || !q){
+    box.innerHTML='<div class="empty">請先輸入客戶名稱或統編搜尋</div>';
+    return;
+  }
+  let map={};
+  state.records.forEach(r=>{
+    if(!((String(r.customer||'')+' '+String(r.tax||'')).toLowerCase().includes(q)))return;
+    if(!map[r.customer])map[r.customer]={tax:r.tax,total:0,count:0};
+    map[r.customer].total+=Number(r.amountInc??r.amount)||0;
+    map[r.customer].count++;
+  });
+  let arr=Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0],'zh-Hant'));
+  box.innerHTML=arr.length?arr.map(([name,x])=>`<div class="customer"><div><strong>${esc(name)}</strong><div class="muted">統編：${esc(x.tax||'—')}　共 ${x.count} 筆　累計含稅 ${money(x.total)}</div></div><button class="light" onclick='showCustomer(${JSON.stringify(name)})'>查看帳本</button></div>`).join(''):'<div class="empty">找不到符合的客戶或統編</div>';
+}
+function searchCustomerLedger(){
+  const q=$('customerSearch').value.trim().toLowerCase();
+  if(!q){alert('請輸入客戶名稱或統編');return}
+  renderCustomers(true);
+  const matches=state.records.filter(r=>((r.customer||'')+' '+(r.tax||'')).toLowerCase().includes(q));
+  const names=[...new Set(matches.map(r=>r.customer).filter(Boolean))];
+  if(names.length===1)showCustomer(names[0]);
+}
+function clearCustomerSearch(){
+  $('customerSearch').value='';
+  filterCustomer='';
+  $('customerLedgerPanel').style.display='none';
+  $('customerLedgerPrint').innerHTML='';
+  $('customersList').innerHTML='<div class="empty">請先輸入客戶名稱或統編搜尋</div>';
+  renderRecords();
+}
 function getCustomerRecords(name){return state.records.filter(r=>r.customer===name).sort((a,b)=>(a.date||'').localeCompare(b.date||''))}
 function getCustomerLedgerRange(name){
   const all=getCustomerRecords(name);
