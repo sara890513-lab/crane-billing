@@ -105,6 +105,7 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
   color:#111;
   font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC",Arial,sans-serif;
   box-sizing:border-box;
+  overflow:hidden;
 }
 .customer-a4-header{
   display:grid;
@@ -146,7 +147,9 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
 }
 .customer-a4-info .right{text-align:right}
 .customer-a4-table{
-  width:100%;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
   border-collapse:collapse;
   table-layout:fixed;
   font-size:12px;
@@ -166,8 +169,11 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
 .customer-a4-table .money{text-align:right;white-space:nowrap}
 .customer-a4-empty td{height:34px}
 .customer-a4-totals{
-  width:100%;
+  width:100% !important;
+  min-width:0 !important;
+  max-width:100% !important;
   border-collapse:collapse;
+  table-layout:fixed;
   margin-top:-1px;
   font-size:13px;
 }
@@ -195,6 +201,15 @@ h2{font-weight:900}.primary{background:#f5b900;color:#161616}.primary:hover{back
   .customer-ledger-preview-wrap{overflow:auto;-webkit-overflow-scrolling:touch}
   .customer-a4-sheet{transform-origin:top left}
 }
+
+.customer-a4-sheet *{box-sizing:border-box}
+.customer-a4-table th,.customer-a4-table td{
+  min-width:0 !important;
+  max-width:none !important;
+  overflow-wrap:anywhere;
+}
+.customer-a4-table td.money{font-variant-numeric:tabular-nums}
+
 </style>
 
 </head>
