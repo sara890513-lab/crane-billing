@@ -14,7 +14,7 @@ h2{font-size:18px;margin:0 0 13px}.grid{display:grid;grid-template-columns:repea
 label{display:block;font-size:13px;font-weight:700;margin:0 0 5px}
 input,select,textarea{width:100%;font-size:16px;padding:11px;border:1px solid #d4d8dd;border-radius:10px;background:white}textarea{min-height:72px;resize:vertical}
 button{border:0;border-radius:10px;padding:11px 15px;font-size:15px;font-weight:750;cursor:pointer}.primary{background:#222;color:white}.light{background:#e9edf1}.danger{background:#ffe1e1;color:#a40000}.mapbtn{background:#e8f1ff;color:#1456a0}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.finance-stats{grid-template-columns:repeat(5,1fr)}.stat{background:#f6f7f8;border-radius:12px;padding:12px}.stat b{display:block;font-size:19px;margin-top:4px}.muted{font-size:12px;color:#777}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.finance-stats{grid-template-columns:repeat(6,1fr)}.stat{background:#f6f7f8;border-radius:12px;padding:12px}.stat b{display:block;font-size:19px;margin-top:4px}.muted{font-size:12px;color:#777}
 .customer-search{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.customer-search input{flex:1;min-width:220px}.customer-search button{white-space:nowrap}.search-hint{font-size:13px;margin-top:6px}.customer-list{display:grid;gap:8px}.customer{border:1px solid #e1e4e7;border-radius:12px;padding:12px;display:flex;justify-content:space-between;gap:10px;align-items:center}.customer strong{font-size:16px}
 .table-wrap{overflow:auto}table{border-collapse:collapse;width:100%;min-width:1180px}th,td{padding:9px 8px;border-bottom:1px solid #eee;text-align:left;font-size:13px;vertical-align:top}th{background:#f7f7f7}.total{text-align:right;font-size:21px;font-weight:800;margin-top:12px}.empty{text-align:center;color:#888;padding:22px}
 .badge{display:inline-block;background:#eee;border-radius:999px;padding:3px 7px;font-size:12px;margin:1px}.taxbox{background:#f8fafc;border:1px solid #e5e9ef;border-radius:12px;padding:12px}.taxrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.taxitem span{display:block;font-size:12px;color:#777}.taxitem b{display:block;font-size:18px;margin-top:4px}.finance-card{background:#fff;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px #0001}
@@ -428,17 +428,975 @@ body.auth-locked #publicCreateUserModal.public-create-open{display:flex!importan
 .company-lookup-item span{display:block;margin-top:3px;font-size:12px;color:#6b7680}
 .company-lookup-item:hover,.company-lookup-item:active{background:#fff8df}
 </style>
+
+<style id="v23-dashboard-vehicle-style">
+#finance{
+  border:0!important;border-radius:24px!important;padding:20px!important;
+  background:linear-gradient(145deg,#ffffff,#f8fbff)!important;
+  box-shadow:0 14px 38px rgba(24,38,60,.08)!important;
+}
+#finance h2{margin:0 0 16px;font-size:22px;letter-spacing:.02em}
+#finance h2::after{
+  content:"所有收入、匯款、現金與結餘皆以未稅金額計算";
+  display:block;margin-top:5px;font-size:12px;font-weight:600;color:#7b8491;
+}
+#finance .finance-stats{gap:12px}
+#finance .stat{
+  position:relative;overflow:hidden;min-height:88px;border:1px solid rgba(0,0,0,.035);
+  border-radius:18px;padding:15px 14px!important;box-shadow:0 7px 20px rgba(31,45,61,.055);
+}
+#finance .stat:nth-child(1){background:#fff1df}
+#finance .stat:nth-child(2){background:#e9f7ef}
+#finance .stat:nth-child(3){background:#edf3ff}
+#finance .stat:nth-child(4){background:#f4efff}
+#finance .stat:nth-child(5){background:#fff0f0}
+#finance .stat:nth-child(6){background:#e8f8f6}
+#finance .stat .muted{font-size:12px;font-weight:800;color:#667085}
+#finance .stat b{font-size:22px;line-height:1.15;margin-top:9px;color:#18202a}
+#finance .actions{justify-content:center;margin-top:16px}
+#finance .actions button{border-radius:999px;padding:9px 15px}
+#vehicleTypesModal{
+  position:fixed;inset:0;z-index:10050;background:rgba(17,24,39,.46);
+  display:none;align-items:center;justify-content:center;padding:18px;
+}
+#vehicleTypesModal.open{display:flex}
+.vehicle-types-box{
+  width:min(520px,100%);max-height:82vh;overflow:auto;background:#f8fafc;
+  border-radius:24px;padding:20px;box-shadow:0 24px 70px rgba(0,0,0,.25);
+}
+.vehicle-types-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.vehicle-types-head h2{margin:0;font-size:22px}
+.vehicle-types-close{border:0;background:#e9edf2;border-radius:12px;padding:9px 12px;font-weight:900}
+.vehicle-types-add{
+  display:grid;grid-template-columns:1fr auto;gap:8px;margin:16px 0 8px;
+  background:#fff;border-radius:18px;padding:10px;box-shadow:0 7px 22px rgba(31,45,61,.06);
+}
+.vehicle-types-add input{border:0!important;box-shadow:none!important;background:transparent!important}
+.vehicle-types-add button{border:0;border-radius:12px;padding:0 17px;font-weight:900;background:#18202a;color:#fff}
+.vehicle-type-list{display:grid;gap:9px;margin-top:14px}
+.vehicle-type-item{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;
+  border:1px solid #edf0f3;border-radius:16px;padding:12px 13px;box-shadow:0 5px 15px rgba(31,45,61,.04);
+}
+.vehicle-type-name{font-size:16px;font-weight:900}
+.vehicle-type-delete{border:0;border-radius:10px;padding:7px 10px;background:#fff0f0;color:#b42318;font-weight:800}
+.vehicle-types-note{font-size:12px;color:#7b8491;line-height:1.55;margin-top:5px}
+@media(max-width:650px){
+  #finance{padding:15px!important;border-radius:20px!important}
+  #finance .finance-stats{grid-template-columns:1fr 1fr!important;gap:9px}
+  #finance .stat{min-height:82px;padding:13px 12px!important}
+  #finance .stat b{font-size:19px}
+  .vehicle-types-box{padding:16px;border-radius:20px}
+}
+</style>
+
+
+<style id="v24-home-dashboard-style">
+#dashboard{
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  gap:12px!important;padding:16px!important;border:0!important;border-radius:24px!important;
+  background:linear-gradient(145deg,#fff,#f7faff)!important;
+  box-shadow:0 14px 38px rgba(24,38,60,.08)!important;
+}
+#dashboard .metric{
+  min-width:0!important;min-height:96px!important;border:1px solid rgba(0,0,0,.035)!important;
+  border-radius:18px!important;padding:15px 13px!important;
+  box-shadow:0 7px 20px rgba(31,45,61,.055)!important;
+}
+#dashboard .metric.income{background:#fff1df!important}
+#dashboard .metric.tax{background:#e9f7ef!important}
+#dashboard .metric.expense{background:#fff0f0!important}
+#dashboard .metric.balance{background:#e8f8f6!important}
+#dashboard .metric.jobs{background:#edf3ff!important}
+#dashboard .metric-icon{font-size:23px!important}
+#dashboard .metric span{font-size:12px!important;font-weight:800!important;color:#667085!important}
+#dashboard .metric strong{font-size:20px!important;line-height:1.2!important;color:#18202a!important}
+@media(max-width:900px){
+  #dashboard{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:650px){
+  #dashboard{grid-template-columns:1fr 1fr!important;gap:9px!important;padding:10px!important;border-radius:20px!important}
+  #dashboard .metric{min-height:88px!important;padding:13px 11px!important}
+  #dashboard .metric strong{font-size:18px!important}
+  #dashboard .metric.jobs:last-child{grid-column:1/-1}
+}
+</style>
+
+
+<style id="finance-v26-style">
+#finance.finance-v26{
+  padding:22px!important;border:0!important;border-radius:28px!important;background:#fff!important;
+  box-shadow:0 14px 42px rgba(28,45,70,.10)!important;overflow:hidden;
+}
+.finance-v26-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px}
+.finance-v26-head h2{margin:0!important;font-size:28px!important;line-height:1.2;color:#111b2b}
+.finance-v26-head p{margin:7px 0 0;font-size:13px;font-weight:700;color:#7b8798}
+.finance-month-pill{flex:0 0 auto;background:#f1f5f9;border-radius:999px;padding:11px 15px;font-weight:900;color:#25364f}
+.finance-v26-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.finance-v26-card{
+  min-height:142px;border-radius:23px;padding:20px;display:flex;align-items:center;gap:15px;
+  border:1px solid rgba(30,50,80,.055);box-shadow:0 8px 24px rgba(31,45,61,.05);
+}
+.finance-v26-card.income{background:linear-gradient(145deg,#fff9eb,#ffefd3)}
+.finance-v26-card.tax{background:linear-gradient(145deg,#f0fcf5,#dcf6e8)}
+.finance-v26-card.transfer{background:linear-gradient(145deg,#f2f7ff,#e3eeff)}
+.finance-v26-card.cash{background:linear-gradient(145deg,#faf5ff,#eee4ff)}
+.finance-v26-card.expense{background:linear-gradient(145deg,#fff6f6,#ffe5e5)}
+.finance-v26-card.balance{background:linear-gradient(145deg,#effcf9,#d9f5ef)}
+.finance-v26-icon{
+  flex:0 0 54px;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(255,255,255,.8);font-size:27px;box-shadow:0 4px 12px rgba(30,50,80,.05)
+}
+.finance-v26-card>div:last-child{min-width:0}
+.finance-v26-card span{display:block;font-size:14px;font-weight:900;color:#526078;margin-bottom:7px}
+.finance-v26-card b{display:block;font-size:29px;line-height:1.05;font-weight:950;color:#101a2b;letter-spacing:-.025em}
+.finance-v26-card small{display:block;margin-top:8px;font-size:12px;font-weight:700;color:#7b8798}
+.finance-v26-actions{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:10px;margin-top:20px}
+.finance-v26-actions button{
+  min-height:50px;border:0!important;border-radius:18px!important;background:#f2f5f9!important;
+  color:#1671e8!important;font-weight:900!important;font-size:15px!important;box-shadow:none!important
+}
+.finance-v26-actions .current{background:linear-gradient(135deg,#2f80ed,#1769e0)!important;color:#fff!important}
+@media(max-width:650px){
+  #finance.finance-v26{padding:18px 15px!important;border-radius:24px!important}
+  .finance-v26-head{align-items:center;margin-bottom:17px}
+  .finance-v26-head h2{font-size:24px!important}
+  .finance-v26-head p{font-size:12px}
+  .finance-month-pill{padding:9px 11px;font-size:12px}
+  .finance-v26-grid{gap:10px}
+  .finance-v26-card{min-height:125px;padding:15px 12px;gap:9px;border-radius:19px;align-items:flex-start}
+  .finance-v26-icon{width:38px;height:38px;flex-basis:38px;font-size:20px}
+  .finance-v26-card span{font-size:12px;margin-bottom:7px}
+  .finance-v26-card b{font-size:23px}
+  .finance-v26-card small{font-size:10px;margin-top:6px}
+  .finance-v26-actions{gap:8px}
+  .finance-v26-actions button{min-height:46px!important;font-size:13px!important;padding:7px 5px!important}
+}
+@media(max-width:390px){
+  .finance-v26-card{padding:13px 10px}
+  .finance-v26-icon{display:none}
+  .finance-v26-card b{font-size:22px}
+}
+</style>
+
+
+<style id="v27-full-ui-redesign">
+:root{
+  --v27-navy:#073c69; --v27-blue:#1479ee; --v27-bg:#f4f8fc;
+  --v27-line:#dce7f2; --v27-text:#13233a; --v27-muted:#718096;
+  --v27-yellow:#ffd54a;
+}
+html,body{background:var(--v27-bg)!important;color:var(--v27-text)!important}
+body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif!important}
+header{
+  background:linear-gradient(135deg,#062f55,#075184)!important;
+  border-bottom:5px solid #ffd334!important;
+  box-shadow:0 8px 24px rgba(6,48,84,.14)!important;
+}
+header h1,.brand h1{color:#fff!important;letter-spacing:.06em}
+header .sub,.brand .sub{color:rgba(255,255,255,.88)!important}
+nav{
+  background:rgba(255,255,255,.94)!important;backdrop-filter:blur(12px);
+  border-bottom:1px solid #e2ebf4!important;box-shadow:0 5px 18px rgba(35,61,90,.06)!important
+}
+nav button,.top-tabs button{
+  border:1px solid #d7e4f1!important;background:#fff!important;color:#18314d!important;
+  border-radius:14px!important;font-weight:850!important;box-shadow:0 3px 10px rgba(32,63,95,.045)!important
+}
+nav button:hover,.top-tabs button:hover{background:#eef6ff!important;color:#0869d8!important}
+.card{
+  border:1px solid rgba(213,226,239,.9)!important;border-radius:24px!important;background:#fff!important;
+  box-shadow:0 10px 30px rgba(34,61,90,.07)!important
+}
+.card h2,.card h3{color:#15263d!important}
+button{font-weight:850!important}
+button.primary,.primary{
+  background:linear-gradient(135deg,#2f8cff,#0869dc)!important;color:#fff!important;
+  border:0!important;border-radius:14px!important;box-shadow:0 7px 16px rgba(17,113,229,.18)!important
+}
+button.light,.light{background:#f2f7fc!important;color:#176fcf!important;border:1px solid #dce8f4!important;border-radius:14px!important}
+input,select,textarea{
+  border:1px solid #d5e2ee!important;border-radius:13px!important;background:#fbfdff!important;
+  box-shadow:inset 0 1px 2px rgba(20,50,80,.025)!important
+}
+input:focus,select:focus,textarea:focus{border-color:#69aaf2!important;box-shadow:0 0 0 3px rgba(43,135,238,.12)!important}
+
+/* 本月收支：縮小手機金額，維持 2x3 卡片 */
+.finance-v26-card b{font-size:27px!important}
+.finance-v26-card.income b{color:#c95410!important}
+.finance-v26-card.tax b,.finance-v26-card.balance b{color:#08745e!important}
+.finance-v26-card.transfer b{color:#0867ce!important}
+.finance-v26-card.cash b{color:#6731b9!important}
+.finance-v26-card.expense b{color:#c71927!important}
+
+/* 月工作區：工具列與月曆統一 */
+#monthlyWork.card,#calendarSection.card{overflow:hidden!important}
+.calendar-toolbar,.month-toolbar,.calendar-actions{
+  background:#f7fbff!important;border:1px solid #e1ebf5!important;border-radius:18px!important;padding:10px!important
+}
+.calendar,.calendar-grid{
+  gap:3px!important;background:#edf3f9!important;border-radius:16px!important;padding:3px!important;overflow:hidden
+}
+.calendar>div,.calendar-grid>div,.day{
+  border-color:#dce7f1!important;background:#fff!important
+}
+.day.today,.today{
+  background:#fffbed!important;box-shadow:inset 0 0 0 2px #f3c400!important
+}
+.day.other,.other-month{background:#f6f8fb!important;color:#a2acb8!important}
+.event,.job-item{
+  background:#eaf4ff!important;color:#174d80!important;border-radius:7px!important;border:0!important
+}
+.expense-event,.expense-item{
+  background:#fff0f1!important;color:#c4202d!important;border-radius:7px!important;border:0!important
+}
+
+/* 資料表與清單 */
+table{border-collapse:separate!important;border-spacing:0!important;overflow:hidden!important;border-radius:15px!important}
+th{background:#eef5fc!important;color:#425873!important;font-weight:900!important}
+td,th{border-color:#dfe9f3!important}
+tbody tr:nth-child(even){background:#fbfdff!important}
+.list-item,.record-row,.expense-row{
+  border:1px solid #e1eaf3!important;border-radius:15px!important;background:#fff!important;
+  box-shadow:0 4px 12px rgba(35,60,90,.04)!important
+}
+
+/* modal */
+.modal-content,.modal .box,.dialog{
+  border-radius:24px!important;border:1px solid #dce7f2!important;
+  box-shadow:0 24px 70px rgba(13,42,70,.2)!important
+}
+
+/* 手機 */
+@media(max-width:650px){
+  body{background:#f3f7fb!important}
+  .wrap,.container,main{padding-left:10px!important;padding-right:10px!important}
+  .card{border-radius:20px!important}
+  nav{gap:7px!important;padding:9px 8px!important;overflow-x:auto!important}
+  nav button{white-space:nowrap!important;font-size:12px!important;padding:10px 11px!important}
+  .finance-v26-head{gap:8px!important}
+  .finance-v26-head h2{font-size:23px!important}
+  .finance-v26-grid{gap:9px!important}
+  .finance-v26-card{min-height:120px!important;padding:14px 11px!important;gap:8px!important}
+  .finance-v26-card span{font-size:11.5px!important;line-height:1.3!important}
+  .finance-v26-card b{font-size:21px!important;letter-spacing:-.035em!important;white-space:nowrap!important}
+  .finance-v26-card small{font-size:9.5px!important}
+  .finance-v26-icon{width:34px!important;height:34px!important;flex-basis:34px!important;font-size:18px!important}
+  .calendar,.calendar-grid{font-size:11px!important}
+  .day{min-width:0!important;padding:5px 3px!important}
+  .event,.job-item,.expense-event,.expense-item{font-size:9px!important;line-height:1.25!important;padding:3px!important}
+  table{font-size:11px!important}
+}
+@media(max-width:390px){
+  .finance-v26-card b{font-size:19px!important}
+}
+</style>
+
+
+<style id="v27-1-calendar-mobile-fix">
+/* v27.1：修正手機版每月工作行事曆右側被切掉 */
+@media(max-width:680px){
+  #monthlyWork{
+    overflow:visible!important;
+    padding:12px 9px!important;
+  }
+  #monthlyWork .calendar-wrap{
+    width:100%!important;
+    max-width:100%!important;
+    overflow:visible!important;
+  }
+  #monthlyWork .calendar-grid{
+    min-width:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    grid-template-columns:repeat(7,minmax(0,1fr))!important;
+    gap:3px!important;
+    padding:0!important;
+    background:transparent!important;
+  }
+  #monthlyWork .calendar-week{
+    min-width:0!important;
+    padding:5px 0!important;
+    font-size:10px!important;
+    border-radius:8px!important;
+  }
+  #monthlyWork .cal-day{
+    min-width:0!important;
+    width:auto!important;
+    min-height:102px!important;
+    padding:5px 3px!important;
+    border-radius:9px!important;
+    overflow:hidden!important;
+  }
+  #monthlyWork .cal-day .num{
+    font-size:13px!important;
+    margin-bottom:4px!important;
+  }
+  #monthlyWork .cal-item,
+  #monthlyWork .cal-expense{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    font-size:8px!important;
+    line-height:1.2!important;
+    padding:3px 2px!important;
+    margin-top:3px!important;
+    border-radius:6px!important;
+    overflow:hidden!important;
+    word-break:break-word!important;
+  }
+  #monthlyWork .customer-name{
+    white-space:normal!important;
+    overflow:hidden!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+  }
+  #monthlyWork .calendar-head{
+    flex-wrap:wrap!important;
+    align-items:flex-start!important;
+  }
+  #monthlyWork .calendar-head .actions{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:repeat(4,1fr)!important;
+    gap:6px!important;
+  }
+  #monthlyWork .calendar-head .actions button{
+    min-width:0!important;
+    padding:8px 4px!important;
+    font-size:11px!important;
+  }
+  #monthlyWork #calendarTitle{
+    font-size:20px!important;
+  }
+  #monthlyWork .calendar-summary{
+    font-size:11px!important;
+    line-height:1.5!important;
+    padding:9px!important;
+  }
+}
+@media(max-width:390px){
+  #monthlyWork .cal-day{min-height:92px!important;padding:4px 2px!important}
+  #monthlyWork .cal-item,#monthlyWork .cal-expense{font-size:7.5px!important}
+  #monthlyWork .calendar-week{font-size:9px!important}
+}
+</style>
+
+
+<style id="v28-blue-green-calendar">
+/* v28：依照確認的藍／綠月曆配色與工具列排列 */
+@media(max-width:680px){
+  /* 月工作標題 + 匯出按鈕 */
+  #monthlyWork .calendar-head{
+    display:grid!important;
+    grid-template-columns:1fr auto auto!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+  #monthlyWork .calendar-head h2{
+    grid-column:1!important;
+    margin:0!important;
+  }
+  #monthlyWork .calendar-head .actions{
+    grid-column:2 / 4!important;
+    width:auto!important;
+    display:flex!important;
+    gap:7px!important;
+  }
+
+  /* 上月／今天／下月：固定同一排、等寬、對齊 */
+  #monthlyWork .month-nav,
+  #monthlyWork .calendar-nav{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:9px!important;
+    width:100%!important;
+    margin:12px 0 16px!important;
+  }
+  #monthlyWork .month-nav button,
+  #monthlyWork .calendar-nav button{
+    width:100%!important;
+    min-width:0!important;
+    min-height:48px!important;
+    margin:0!important;
+    border-radius:15px!important;
+    background:#eef6ff!important;
+    border:1px solid #cfe3f8!important;
+    color:#0873dd!important;
+    font-size:14px!important;
+    font-weight:900!important;
+  }
+  #monthlyWork .month-nav button:nth-child(2),
+  #monthlyWork .calendar-nav button:nth-child(2){
+    background:linear-gradient(135deg,#2f8fff,#0877ed)!important;
+    color:#fff!important;
+    border-color:transparent!important;
+  }
+
+  /* 星期列淡藍 */
+  #monthlyWork .calendar-week{
+    background:#eaf5ff!important;
+    color:#132a46!important;
+    border:1px solid #d5e8f8!important;
+  }
+
+  /* 請款收入：淡藍底 */
+  #monthlyWork .cal-item{
+    background:#e9f4ff!important;
+    color:#123f70!important;
+    border:0!important;
+  }
+
+  /* 支出：改成淡綠，完全取消紅色 */
+  #monthlyWork .cal-expense{
+    background:#e2f7eb!important;
+    color:#087244!important;
+    border:0!important;
+  }
+
+  /* 今天：暖黃色框 */
+  #monthlyWork .cal-day.today,
+  #monthlyWork .cal-day.is-today{
+    background:#fffdf3!important;
+    border-color:#f4b400!important;
+    box-shadow:inset 0 0 0 2px #f4b400!important;
+  }
+
+  /* 其他月份淡灰 */
+  #monthlyWork .cal-day.other-month,
+  #monthlyWork .cal-day.muted{
+    background:#f5f7fa!important;
+    color:#a1aab5!important;
+  }
+}
+
+/* 支出清單的危險紅色只保留刪除按鈕；資料金額改深色 */
+#expenses .amount,
+#expenseList .amount{
+  color:#18314d!important;
+}
+
+/* 桌面月曆也同步：收入藍、支出綠 */
+#monthlyWork .cal-item{
+  background:#e9f4ff!important;
+  color:#123f70!important;
+}
+#monthlyWork .cal-expense{
+  background:#e2f7eb!important;
+  color:#087244!important;
+}
+</style>
+
+
+<style id="v28-1-calendar-header-fix">
+/* v28.1：依確認畫面重排每月工作頂部，避免標題被擠成直排 */
+@media(max-width:680px){
+  #monthlyWork{
+    padding:16px 14px!important;
+  }
+
+  /* 第一排：每月工作在左，匯出 PDF / 圖檔在右 */
+  #monthlyWork .calendar-head{
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    width:100%!important;
+  }
+  #monthlyWork .calendar-head h2{
+    flex:1 1 auto!important;
+    min-width:128px!important;
+    width:auto!important;
+    grid-column:auto!important;
+    white-space:nowrap!important;
+    word-break:keep-all!important;
+    writing-mode:horizontal-tb!important;
+    margin:0!important;
+    font-size:23px!important;
+    line-height:1.15!important;
+  }
+  #monthlyWork .calendar-head .actions{
+    flex:0 0 auto!important;
+    width:auto!important;
+    grid-column:auto!important;
+    display:flex!important;
+    flex-direction:row!important;
+    flex-wrap:nowrap!important;
+    gap:6px!important;
+    margin:0!important;
+  }
+  #monthlyWork .calendar-head .actions button{
+    width:auto!important;
+    min-width:0!important;
+    min-height:44px!important;
+    padding:8px 9px!important;
+    font-size:11px!important;
+    white-space:nowrap!important;
+    border-radius:13px!important;
+  }
+
+  /* 第二排：上月 / 今天 / 下月，固定三等分 */
+  #monthlyWork .month-nav,
+  #monthlyWork .calendar-nav{
+    clear:both!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    width:100%!important;
+    gap:9px!important;
+    margin:14px 0 17px!important;
+  }
+  #monthlyWork .month-nav button,
+  #monthlyWork .calendar-nav button{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:50px!important;
+    padding:8px 4px!important;
+    margin:0!important;
+    white-space:nowrap!important;
+    font-size:14px!important;
+    border-radius:15px!important;
+  }
+
+  /* 月份置中 */
+  #monthlyWork #calendarTitle{
+    width:100%!important;
+    text-align:center!important;
+    font-size:25px!important;
+    margin:7px 0 12px!important;
+  }
+}
+
+/* 更窄的手機仍維持橫排 */
+@media(max-width:390px){
+  #monthlyWork .calendar-head h2{font-size:20px!important;min-width:112px!important}
+  #monthlyWork .calendar-head .actions button{font-size:10px!important;padding:7px 6px!important}
+}
+</style>
+
+
+<style id="v28-2-calendar-header-mobile-fix">
+/* v28.2：手機版月曆頂部改成三排，避免 PDF / 圖檔被切掉 */
+@media(max-width:680px){
+  #monthlyWork{
+    overflow:hidden!important;
+  }
+
+  /* 第一排：標題 */
+  #monthlyWork .calendar-head{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:9px!important;
+    width:100%!important;
+    align-items:center!important;
+  }
+  #monthlyWork .calendar-head h2{
+    grid-column:1 / -1!important;
+    width:100%!important;
+    min-width:0!important;
+    white-space:nowrap!important;
+    writing-mode:horizontal-tb!important;
+    font-size:24px!important;
+    margin:0 0 2px!important;
+  }
+
+  /* 第二排：PDF / 圖檔，各佔一半 */
+  #monthlyWork .calendar-head .actions{
+    grid-column:1 / -1!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    width:100%!important;
+    gap:9px!important;
+    margin:0!important;
+  }
+  #monthlyWork .calendar-head .actions button{
+    width:100%!important;
+    min-width:0!important;
+    min-height:46px!important;
+    padding:8px 5px!important;
+    margin:0!important;
+    font-size:12px!important;
+    white-space:nowrap!important;
+    border-radius:14px!important;
+  }
+
+  /* 第三排：上月 / 今天 / 下月 */
+  #monthlyWork .month-nav,
+  #monthlyWork .calendar-nav{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    width:100%!important;
+    gap:9px!important;
+    margin:12px 0 16px!important;
+  }
+  #monthlyWork .month-nav button,
+  #monthlyWork .calendar-nav button{
+    width:100%!important;
+    min-width:0!important;
+    min-height:48px!important;
+    padding:8px 4px!important;
+    margin:0!important;
+    font-size:14px!important;
+    white-space:nowrap!important;
+  }
+}
+</style>
+
+
+<style id="v28-3-calendar-controls-fixed">
+@media(max-width:680px){
+  /* 標題獨立一排 */
+  #monthlyWork .calendar-head{
+    display:block!important;width:100%!important;
+  }
+  #monthlyWork .calendar-head h2{
+    display:block!important;width:100%!important;margin:0 0 12px!important;
+    white-space:nowrap!important;writing-mode:horizontal-tb!important;
+  }
+
+  /* 匯出按鈕固定第二排 */
+  #monthlyWork .calendar-head .actions{
+    display:grid!important;grid-template-columns:1fr 1fr!important;
+    width:100%!important;gap:9px!important;margin:0 0 12px!important;
+  }
+  #monthlyWork .calendar-head .actions button{
+    width:100%!important;min-width:0!important;min-height:46px!important;
+    margin:0!important;padding:8px 4px!important;white-space:nowrap!important;
+  }
+
+  /* 月份導覽固定第三排，禁止和匯出按鈕混排 */
+  #monthlyWork .month-nav,
+  #monthlyWork .calendar-nav{
+    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    width:100%!important;clear:both!important;float:none!important;
+    gap:9px!important;margin:0 0 18px!important;
+  }
+  #monthlyWork .month-nav button,
+  #monthlyWork .calendar-nav button{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:100%!important;min-width:0!important;min-height:48px!important;
+    margin:0!important;padding:8px 4px!important;white-space:nowrap!important;
+  }
+}
+</style>
+
+
+<style id="v28-4-toolbar-structural-fix">
+#monthlyWork .calendar-title-row{
+  display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;
+}
+#monthlyWork .calendar-title-row h2{margin:0!important;white-space:nowrap!important}
+#monthlyWork .calendar-export-actions{display:flex!important;gap:8px!important;flex:0 0 auto!important}
+#monthlyWork .calendar-month-actions{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:10px!important;width:100%!important;margin:14px 0 16px!important;
+}
+#monthlyWork .calendar-month-actions button{width:100%!important;min-width:0!important;min-height:48px!important;margin:0!important}
+@media(max-width:680px){
+  #monthlyWork .calendar-title-row{display:block!important}
+  #monthlyWork .calendar-title-row h2{display:block!important;width:100%!important;margin:0 0 12px!important;font-size:24px!important}
+  #monthlyWork .calendar-export-actions{
+    display:grid!important;grid-template-columns:1fr 1fr!important;width:100%!important;gap:9px!important
+  }
+  #monthlyWork .calendar-export-actions button{
+    width:100%!important;min-width:0!important;min-height:46px!important;padding:8px 5px!important;
+    font-size:12px!important;white-space:nowrap!important
+  }
+  #monthlyWork .calendar-month-actions{
+    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:9px!important;width:100%!important;margin:12px 0 17px!important
+  }
+  #monthlyWork .calendar-month-actions button{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:100%!important;min-width:0!important;min-height:48px!important;padding:8px 4px!important;
+    font-size:14px!important;white-space:nowrap!important
+  }
+}
+</style>
+
+
+<style id="v29-expense-redesign">
+/* v29：支出頁統一成新版藍白＋淡綠卡片風格；月曆 v28.4 不動 */
+#expenses{
+  border-radius:24px!important;
+}
+#expenses h2{
+  font-size:28px!important;
+  color:#14263d!important;
+}
+#expenses input{
+  min-height:52px!important;
+  background:#fbfdff!important;
+}
+#expenses .actions{
+  gap:10px!important;
+}
+#expenses .actions button{
+  min-height:48px!important;
+  border-radius:15px!important;
+}
+#expenses .expense-row{
+  background:linear-gradient(135deg,#fbfffd,#f0fbf5)!important;
+  border:1px solid #dcefe5!important;
+  border-radius:17px!important;
+  padding:14px!important;
+  margin:9px 0!important;
+  box-shadow:0 5px 14px rgba(31,88,61,.045)!important;
+}
+#expenses .expense-row .amount,
+#expenseList .amount{
+  color:#08734a!important;
+  font-weight:950!important;
+}
+#expenses .expense-row button,
+#expenseList button{
+  border-radius:999px!important;
+}
+#expenses .expense-row button:not(.danger),
+#expenseList button:not(.danger){
+  background:#eef6ff!important;
+  color:#1472d4!important;
+  border:1px solid #d3e6f8!important;
+}
+#expenses .expense-row .danger,
+#expenseList .danger{
+  background:#fff1ee!important;
+  color:#b4473e!important;
+  border:1px solid #f5d7d2!important;
+}
+@media(max-width:650px){
+  #expenses{padding:16px 14px!important}
+  #expenses h2{font-size:25px!important;margin-bottom:14px!important}
+  #expenses input{min-height:48px!important;font-size:15px!important}
+  #expenses .actions{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+  }
+  #expenses .expense-row{
+    padding:12px 10px!important;
+    border-radius:15px!important;
+  }
+  #expenses .expense-row .amount,
+  #expenseList .amount{
+    font-size:17px!important;
+  }
+}
+</style>
+
+
+<style id="v30-billing-form-mobile">
+@media(max-width:650px){
+  #newRecord{padding:16px 14px!important}
+  #newRecord h2{font-size:25px!important;margin:0 0 14px!important}
+  #newRecord .grid{gap:10px!important}
+  #newRecord label{margin-bottom:5px!important;font-size:14px!important;font-weight:900!important}
+  #newRecord input,#newRecord select,#newRecord textarea{
+    min-height:46px!important;padding:10px 12px!important;font-size:15px!important;border-radius:13px!important
+  }
+  #newRecord textarea{min-height:76px!important}
+  #newRecord .location-row{
+    display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important
+  }
+  #newRecord .location-row input{grid-column:1/-1!important;width:100%!important}
+  #newRecord .location-row .mapbtn{
+    width:100%!important;min-width:0!important;min-height:44px!important;margin:0!important;
+    padding:8px 5px!important;border-radius:13px!important;font-size:13px!important;white-space:nowrap!important
+  }
+  #newRecord .muted{font-size:11px!important;line-height:1.45!important}
+  #newRecord .taxbox{padding:12px!important;border-radius:16px!important}
+  #newRecord>.actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important}
+  #newRecord>.actions button{min-height:46px!important;margin:0!important;border-radius:14px!important}
+  #newRecord>.actions .primary{grid-column:1/-1!important}
+}
+</style>
+
+
+<style id="v31-approved-billing-layout">
+/* v31：依照使用者確認的新增請款版面 */
+@media(max-width:650px){
+  #newRecord{
+    padding:15px 14px 18px!important;
+    border-radius:22px!important;
+  }
+  #newRecord label{
+    margin:10px 0 5px!important;
+    font-size:14px!important;
+    font-weight:900!important;
+    color:#14263d!important;
+  }
+  #newRecord input,#newRecord select,#newRecord textarea{
+    width:100%!important;
+    box-sizing:border-box!important;
+    min-height:45px!important;
+    padding:9px 11px!important;
+    border-radius:12px!important;
+    font-size:15px!important;
+    background:#fbfdff!important;
+  }
+  #newRecord textarea{min-height:70px!important}
+
+  /* 工作地點工具：真正並排 */
+  #newRecord .location-row{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    column-gap:8px!important;
+    row-gap:7px!important;
+    width:100%!important;
+  }
+  #newRecord .location-row input{
+    grid-column:1 / -1!important;
+  }
+  #newRecord .location-row button,
+  #newRecord .location-row .mapbtn{
+    width:100%!important;
+    min-width:0!important;
+    min-height:43px!important;
+    margin:0!important;
+    padding:7px 4px!important;
+    border-radius:12px!important;
+    font-size:13px!important;
+    white-space:nowrap!important;
+  }
+  #newRecord .location-row button:first-of-type{
+    background:#edf4ff!important;
+    color:#2265b7!important;
+  }
+  #newRecord .location-row button:last-of-type{
+    background:#eafaf1!important;
+    color:#28684c!important;
+  }
+
+  /* 工作時間：半天 / 一天 / 加班 / 幾小時同排 */
+  #newRecord .duration-row{
+    display:grid!important;
+    grid-template-columns:.8fr .8fr .8fr 1.35fr!important;
+    gap:7px!important;
+    width:100%!important;
+  }
+  #newRecord .duration-row>*{
+    min-width:0!important;
+    width:100%!important;
+    margin:0!important;
+  }
+
+  /* 最下方操作：新增請款 + 清空並排 */
+  #newRecord>.actions{
+    display:grid!important;
+    grid-template-columns:1.75fr 1fr!important;
+    gap:9px!important;
+    width:100%!important;
+    margin-top:13px!important;
+  }
+  #newRecord>.actions .primary,
+  #newRecord>.actions button{
+    grid-column:auto!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:46px!important;
+    margin:0!important;
+    border-radius:13px!important;
+  }
+  #newRecord>.actions .primary{
+    background:linear-gradient(135deg,#438af4,#2169df)!important;
+    color:#fff!important;
+  }
+  #newRecord .muted{
+    font-size:11px!important;
+    line-height:1.4!important;
+  }
+}
+</style>
+
+
+<style id="v32-duration-buttons">
+#newRecord .duration-buttons{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+  width:100%!important;
+}
+#newRecord .duration-buttons button{
+  min-width:0!important;
+  min-height:46px!important;
+  margin:0!important;
+  border:1.5px solid #c9ddf5!important;
+  border-radius:14px!important;
+  background:#f8fbff!important;
+  color:#2871c8!important;
+  font-size:15px!important;
+  font-weight:900!important;
+}
+#newRecord .duration-buttons button.active{
+  background:linear-gradient(135deg,#438af4,#2169df)!important;
+  border-color:#2169df!important;
+  color:#fff!important;
+  box-shadow:0 6px 14px rgba(33,105,223,.18)!important;
+}
+</style>
+
+
+<style id="v33-payment-buttons">
+#newRecord .payment-buttons{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:9px!important;
+  width:100%!important;
+}
+#newRecord .payment-buttons button{
+  width:100%!important;
+  min-width:0!important;
+  min-height:46px!important;
+  margin:0!important;
+  border:1.5px solid #c9ddf5!important;
+  border-radius:14px!important;
+  background:#f8fbff!important;
+  color:#2871c8!important;
+  font-size:15px!important;
+  font-weight:900!important;
+}
+#newRecord .payment-buttons button.active{
+  background:linear-gradient(135deg,#438af4,#2169df)!important;
+  border-color:#2169df!important;
+  color:#fff!important;
+  box-shadow:0 6px 14px rgba(33,105,223,.18)!important;
+}
+</style>
+
 </head>
 <body class="auth-locked">
 
 <button id="accountMenuBtn" type="button" aria-label="開啟帳號選單" aria-expanded="false">☰ 選單</button>
 <div id="accountMenuPanel" aria-hidden="true">
   <button id="menuBusinessBtn" type="button">⚙️ 更改工程行名稱</button>
+  <button id="menuVehicleTypesBtn" type="button">🚜 車種管理</button>
   <button id="menuCreateUserBtn" type="button" class="admin-menu-item">👑 新增使用者</button>
   <button id="menuUsersBtn" type="button" class="admin-menu-item">👥 使用者管理</button>
   <button id="menuLogoutBtn" type="button">🚪 登出</button>
 </div>
 
+
+
+<div id="vehicleTypesModal" aria-hidden="true">
+  <div class="vehicle-types-box">
+    <div class="vehicle-types-head">
+      <h2>🚜 車種管理</h2>
+      <button id="vehicleTypesClose" class="vehicle-types-close" type="button">關閉</button>
+    </div>
+    <div class="vehicle-types-note">每個帳號都有自己的車種清單。新增或刪除只會影響自己的帳號；舊請款紀錄不會被修改。</div>
+    <div class="vehicle-types-add">
+      <input id="newVehicleTypeName" maxlength="40" placeholder="輸入車種，例如：35T、50T、17T吊卡">
+      <button id="addVehicleTypeBtn" type="button">＋ 新增</button>
+    </div>
+    <div id="vehicleTypesStatus" class="vehicle-types-note"></div>
+    <div id="vehicleTypeList" class="vehicle-type-list"></div>
+  </div>
+</div>
 
 <div id="authGate">
  <div class="box">
@@ -542,9 +1500,10 @@ body.auth-locked #publicCreateUserModal.public-create-open{display:flex!importan
 </nav>
 <main>
 <section class="dashboard" id="dashboard">
-<div class="metric income"><div class="metric-icon">💵</div><div><span>本月收入</span><strong id="dashIncome">$0</strong></div></div>
+<div class="metric income"><div class="metric-icon">💵</div><div><span>本月收入（未稅）</span><strong id="dashIncome">$0</strong></div></div>
+<div class="metric tax"><div class="metric-icon">🧮</div><div><span>總稅金</span><strong id="dashTax">$0</strong></div></div>
 <div class="metric expense"><div class="metric-icon">🧾</div><div><span>本月支出</span><strong id="dashExpense">$0</strong></div></div>
-<div class="metric balance"><div class="metric-icon">📈</div><div><span>本月淨收入</span><strong id="dashBalance">$0</strong></div></div>
+<div class="metric balance"><div class="metric-icon">📈</div><div><span>本月淨收入（未稅）</span><strong id="dashBalance">$0</strong></div></div>
 <div class="metric jobs"><div class="metric-icon">🚜</div><div><span>本月工作筆數</span><strong id="dashJobs">0 筆</strong></div></div>
 </section>
 <section class="card today-card" id="todayPanel"><div class="section-head"><h2>🚜 今日工作</h2><span class="date-chip" id="todayDateLabel"></span></div><div id="todayWorkList" class="today-list"></div></section>
@@ -561,14 +1520,23 @@ body.auth-locked #publicCreateUserModal.public-create-open{display:flex!importan
 </div>
 <div><label>統一編號</label><input id="tax" inputmode="numeric" placeholder="8碼統編"></div>
 <div><label>日期 *</label><input id="date" type="date"></div>
-<div><label>車種 *</label><select id="truck"><option>16T</option><option>25T</option><option>15吊卡</option></select></div>
+<div><label>車種 *</label><select id="truck"><option value="">讀取車種中…</option></select></div>
 <div class="full"><label>工作地點</label>
   <div class="location-row"><input id="location" placeholder="例如：高雄市○○區○○路" autocomplete="street-address"><button type="button" class="mapbtn" onclick="useCurrentLocation()">📍目前定位</button><button type="button" class="mapbtn" onclick="openGoogleMaps()">🗺️ Google 地圖</button></div>
   <div id="mapLink" class="maplink"></div>
   <div class="muted" style="margin-top:5px">可直接輸入地址；也可以用目前 GPS 定位，再開 Google 地圖查看。</div>
 </div>
 <div class="full"><label>工作內容 *</label><input id="work" placeholder="例如：吊裝鋼構、吊料"></div>
-<div><label>工作時間</label><select id="duration"><option>半天</option><option selected>一天</option><option>其他</option></select></div>
+<div><label>工作時間</label><div class="duration-buttons" id="durationButtons">
+  <button type="button" data-duration="半天" onclick="setDurationChoice('半天', this)">半天</button>
+  <button type="button" data-duration="一天" onclick="setDurationChoice('一天', this)">一天</button>
+  <button type="button" data-duration="其他" onclick="setDurationChoice('其他', this)">加班</button>
+</div>
+<select id="duration" style="display:none" aria-hidden="true">
+  <option value="半天">半天</option>
+  <option value="一天" selected>一天</option>
+  <option value="其他">其他</option>
+</select></div>
 <div><label>加班時數</label><input id="overtime" type="number" min="0" step="0.5" inputmode="decimal" placeholder="0"></div>
 <div class="full taxbox"><label>金額（自動計算 5% 稅）</label>
   <div class="grid" style="margin-top:8px">
@@ -578,7 +1546,16 @@ body.auth-locked #publicCreateUserModal.public-create-open{display:flex!importan
   </div>
   <div class="muted" style="margin-top:7px">計算方式：未稅金額 × 5% = 稅額；未稅金額 + 稅額 = 含稅金額。</div>
 </div>
-<div><label>收款方式</label><select id="payment"><option>匯款</option><option>簽帳</option><option>現金</option></select></div>
+<div><label>收款方式</label><div class="payment-buttons" id="paymentButtons">
+  <button type="button" data-payment="匯款" onclick="setPaymentChoice('匯款', this)">匯款</button>
+  <button type="button" data-payment="簽帳" onclick="setPaymentChoice('簽帳', this)">簽帳</button>
+  <button type="button" data-payment="現金" onclick="setPaymentChoice('現金', this)">現金</button>
+</div>
+<select id="payment" style="display:none" aria-hidden="true">
+  <option value="匯款" selected>匯款</option>
+  <option value="簽帳">簽帳</option>
+  <option value="現金">現金</option>
+</select></div>
 <div class="full"><label>備註</label><textarea id="note" placeholder="其他請款說明"></textarea></div>
 </div>
 <div class="actions">
@@ -590,15 +1567,17 @@ body.auth-locked #publicCreateUserModal.public-create-open{display:flex!importan
 </section>
 
 <section class="card calendar-card" id="monthlyWork">
-  <div class="calendar-head">
+  <div class="calendar-head calendar-title-row">
     <h2>📅 每月工作</h2>
-    <div class="actions calendar-no-print" style="margin-top:0">
-      <button class="light" onclick="changeCalendarMonth(-1)">← 上月</button>
-      <button class="light" onclick="goCalendarToday()">今天</button>
-      <button class="light" onclick="changeCalendarMonth(1)">下月 →</button>
-      <button class="primary" onclick="exportCalendarPDF()">📄 匯出 PDF</button>
+    <div class="calendar-export-actions calendar-no-print">
+      <button class="light" onclick="exportCalendarPDF()">📄 匯出 PDF</button>
       <button class="light" onclick="exportCalendarPNG()">🖼️ 匯出圖檔</button>
     </div>
+  </div>
+  <div class="calendar-month-actions calendar-no-print">
+    <button class="light" onclick="changeCalendarMonth(-1)">← 上月</button>
+    <button class="primary" onclick="goCalendarToday()">今天</button>
+    <button class="light" onclick="changeCalendarMonth(1)">下月 →</button>
   </div>
   <div id="calendarTitle" style="font-size:18px;font-weight:800;margin-bottom:8px"></div>
   <div class="muted" style="margin-bottom:8px">新增請款後，會依「日期」自動出現在這個月的工作行事曆；每天可直接看到客戶及含稅金額。</div>
@@ -630,16 +1609,47 @@ body.auth-locked #publicCreateUserModal.public-create-open{display:flex!importan
   <div class="finance-total" id="financeTotal"></div>
 </section>
 
-<section class="card" id="finance">
-<h2>本月收支</h2>
-<div class="stats finance-stats">
-<div class="stat"><span class="muted">本月收入（含稅）</span><b id="monthIncome">$0</b></div>
-<div class="stat"><span class="muted">本月匯款</span><b id="monthTransfer">$0</b></div>
-<div class="stat"><span class="muted">本月現金</span><b id="monthCash">$0</b></div>
-<div class="stat"><span class="muted">本月支出</span><b id="monthExpense">$0</b></div>
-<div class="stat"><span class="muted">本月結餘</span><b id="monthBalance">$0</b></div>
-</div>
-<div class="actions print-hide"><button class="light" onclick="setMonth(-1)">← 上月</button><button class="light" onclick="setMonth(0)">本月</button><button class="light" onclick="setMonth(1)">下月 →</button></div>
+<section class="card finance-v26" id="finance">
+  <div class="finance-v26-head">
+    <div>
+      <h2>💰 本月收支（未稅）</h2>
+      <p>所有收入、匯款、現金與結餘皆以未稅金額計算</p>
+    </div>
+    <div class="finance-month-pill">📅 <span id="financeMonthLabel">----</span></div>
+  </div>
+
+  <div class="finance-v26-grid">
+    <div class="finance-v26-card income">
+      <div class="finance-v26-icon">💵</div>
+      <div><span>本月收入（未稅）</span><b id="monthIncome">$0</b><small>不含 5% 稅金</small></div>
+    </div>
+    <div class="finance-v26-card tax">
+      <div class="finance-v26-icon">🧮</div>
+      <div><span>總稅金（5%）</span><b id="monthTaxTotal">$0</b><small>本月應繳稅金</small></div>
+    </div>
+    <div class="finance-v26-card transfer">
+      <div class="finance-v26-icon">🏦</div>
+      <div><span>本月匯款（未稅）</span><b id="monthTransfer">$0</b><small>銀行匯款</small></div>
+    </div>
+    <div class="finance-v26-card cash">
+      <div class="finance-v26-icon">💵</div>
+      <div><span>本月現金（未稅）</span><b id="monthCash">$0</b><small>現金收款</small></div>
+    </div>
+    <div class="finance-v26-card expense">
+      <div class="finance-v26-icon">🧾</div>
+      <div><span>本月支出</span><b id="monthExpense">$0</b><small>營運支出／成本</small></div>
+    </div>
+    <div class="finance-v26-card balance">
+      <div class="finance-v26-icon">📈</div>
+      <div><span>本月結餘（未稅）</span><b id="monthBalance">$0</b><small>收入 − 支出</small></div>
+    </div>
+  </div>
+
+  <div class="finance-v26-actions print-hide">
+    <button type="button" onclick="setMonth(-1)">‹ 上月</button>
+    <button type="button" class="current" onclick="goCurrentMonth()">📅 <span id="financeMonthButton">本月</span></button>
+    <button type="button" onclick="setMonth(1)">下月 ›</button>
+  </div>
 </section>
 
 <section class="card manage-card" id="customers">
@@ -703,10 +1713,10 @@ function today(){return new Date().toISOString().slice(0,10)}
 let selectedDay=today();
 $("date").value=today();
 $("expenseDate").value=today();
-function resetForm(){
+function resetForm(){setTimeout(syncPaymentButtons,0);setTimeout(syncDurationButtons,0);
  editIndex=-1;$('formTitle').textContent='新增請款紀錄';$('cancelEdit').style.display='none';
  ['customer','tax','location','work','overtime','amountEx','taxAmount','amountInc','note'].forEach(id=>$(id).value='');
- $('date').value=selectedDay||today();$('truck').value='16T';$('duration').value='一天';$('payment').value='匯款';$('mapLink').innerHTML='';
+ $('date').value=selectedDay||today();if($('truck').options.length)$('truck').selectedIndex=0;$('duration').value='一天';$('payment').value='匯款';$('mapLink').innerHTML='';
 }
 function round2(n){return Math.round((Number(n)||0)*100)/100}
 function updateTax(){let ex=Number($('amountEx').value)||0;let tax=round2(ex*0.05);let inc=round2(ex+tax);$('taxAmount').value=tax?tax:'';$('amountInc').value=inc?inc:''}
@@ -725,12 +1735,19 @@ function editRecord(i){
 function delRecord(i){if(confirm('確定刪除這筆紀錄？')){state.records.splice(i,1);save()}}
 function addExpense(){let d=prompt('支出日期（YYYY-MM-DD）',today());if(!d)return;let desc=prompt('支出內容');if(!desc)return;let amt=Number(prompt('支出金額','0'));if(!amt)return;state.expenses.unshift({date:d,desc,amount:amt});save()}
 function setMonth(delta){let d=new Date(viewMonth+'-01');d.setMonth(d.getMonth()+delta);viewMonth=d.toISOString().slice(0,7);renderAll()}
+function goCurrentMonth(){viewMonth=new Date().toISOString().slice(0,7);renderAll()}
 function money(n){return '$'+Number(n||0).toLocaleString('zh-TW',{maximumFractionDigits:2})}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function monthRecords(){return state.records.filter(r=>r.date.slice(0,7)===viewMonth&&(!filterCustomer||r.customer===filterCustomer))}
 
 
-function financeAmount(r){ return Number(r.amountInc ?? r.amount ?? 0) || 0; }
+function financeAmount(r){
+  return Number(r.amountEx ?? round2((Number(r.amountInc ?? r.amount ?? 0)||0)/1.05)) || 0;
+}
+function financeTaxAmount(r){
+  const untaxed=financeAmount(r);
+  return Number(r.taxAmount ?? round2((Number(r.amountInc ?? r.amount ?? 0)||0)-untaxed)) || 0;
+}
 function expenseAmount(e){ return Number(e.amount ?? 0) || 0; }
 function addExpense(){
   const date=$('expenseDate').value||today();
@@ -961,8 +1978,12 @@ async function exportCalendarPNG(){
 
 function updateDashboard(){
   const inc=state.records.filter(r=>String(r.date||'').slice(0,7)===viewMonth).reduce((a,r)=>a+financeAmount(r),0);
+  const dashboardTaxTotal=state.records
+    .filter(r=>String(r.date||'').slice(0,7)===viewMonth)
+    .reduce((a,r)=>a+financeTaxAmount(r),0);
   const exp=(state.expenses||[]).filter(e=>String(e.date||'').slice(0,7)===viewMonth).reduce((a,e)=>a+expenseAmount(e),0);
   $('dashIncome').textContent=money(inc);
+  $('dashTax').textContent=money(dashboardTaxTotal);
   $('dashExpense').textContent=money(exp);
   $('dashBalance').textContent=money(inc-exp);
   $('dashJobs').textContent=state.records.filter(r=>String(r.date||'').slice(0,7)===viewMonth).length+' 筆';
@@ -982,12 +2003,20 @@ function updateDashboard(){
 }
 function renderAll(){renderStats();renderRecords();renderCustomers();renderFinance();renderCalendar();updateDashboard()}
 function renderStats(){
+  const monthLabel=document.getElementById('financeMonthLabel');
+  const monthButton=document.getElementById('financeMonthButton');
+  if(monthLabel) monthLabel.textContent=viewMonth;
+  if(monthButton) monthButton.textContent=viewMonth;
   const monthRecords=state.records.filter(r=>String(r.date||'').slice(0,7)===viewMonth);
-  const inc=monthRecords.reduce((a,r)=>a+(Number(r.amountInc??r.amount)||0),0);
-  const transfer=monthRecords.filter(r=>r.payment==='匯款').reduce((a,r)=>a+(Number(r.amountInc??r.amount)||0),0);
-  const cash=monthRecords.filter(r=>r.payment==='現金').reduce((a,r)=>a+(Number(r.amountInc??r.amount)||0),0);
+  const untaxed=r=>Number(r.amountEx ?? round2((Number(r.amountInc??r.amount)||0)/1.05))||0;
+  const taxValue=r=>Number(r.taxAmount ?? round2((Number(r.amountInc??r.amount)||0)-untaxed(r)))||0;
+  const inc=monthRecords.reduce((a,r)=>a+untaxed(r),0);
+  const taxTotal=monthRecords.reduce((a,r)=>a+taxValue(r),0);
+  const transfer=monthRecords.filter(r=>r.payment==='匯款').reduce((a,r)=>a+untaxed(r),0);
+  const cash=monthRecords.filter(r=>r.payment==='現金').reduce((a,r)=>a+untaxed(r),0);
   const exp=state.expenses.filter(r=>String(r.date||'').slice(0,7)===viewMonth).reduce((a,r)=>a+(Number(r.amount)||0),0);
   $('monthIncome').textContent=money(inc);
+  $('monthTaxTotal').textContent=money(taxTotal);
   $('monthTransfer').textContent=money(transfer);
   $('monthCash').textContent=money(cash);
   $('monthExpense').textContent=money(exp);
@@ -1332,10 +2361,13 @@ function fromCloudExpense(e){return {...e,note:e.desc||""}}
 
 async function loadCloud(){
   try{
-    const [records,expenses]=await Promise.all([
+    const [records,expenses,vehicleTypes]=await Promise.all([
       apiFetch("/records?select=*&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=date.desc,created_at.desc"),
-      apiFetch("/expenses?select=*&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=date.desc,created_at.desc")
+      apiFetch("/expenses?select=*&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=date.desc,created_at.desc"),
+      apiFetch("/vehicle_types?select=id,name,created_at&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=created_at.asc")
     ]);
+    window.USER_VEHICLE_TYPES=vehicleTypes||[];
+    renderVehicleTypeSelect();
     state.records=[];
     state.expenses=[];
     state.records=(records||[]).map(fromCloudRecord);
@@ -1741,11 +2773,105 @@ restoreSavedLogin();
   });
 })();
 </script>
+
+<script id="vehicle-types-v23-script">
+window.USER_VEHICLE_TYPES=window.USER_VEHICLE_TYPES||[];
+
+function renderVehicleTypeSelect(){
+  const select=document.getElementById("truck");
+  if(!select) return;
+  const current=select.value;
+  const items=window.USER_VEHICLE_TYPES||[];
+  if(!items.length){
+    select.innerHTML='<option value="">尚未設定車種</option>';
+    return;
+  }
+  select.innerHTML=items.map(v=>`<option value="${esc(v.name)}">${esc(v.name)}</option>`).join("");
+  if(items.some(v=>v.name===current)) select.value=current;
+}
+function renderVehicleTypeManager(){
+  const list=document.getElementById("vehicleTypeList");
+  const items=window.USER_VEHICLE_TYPES||[];
+  if(!items.length){
+    list.innerHTML='<div class="empty">目前還沒有車種，請在上方新增。</div>';
+    return;
+  }
+  list.innerHTML=items.map(v=>`
+    <div class="vehicle-type-item">
+      <div class="vehicle-type-name">🚜 ${esc(v.name)}</div>
+      <button class="vehicle-type-delete" type="button" data-id="${v.id}" data-name="${esc(v.name)}">刪除</button>
+    </div>`).join("");
+}
+async function reloadVehicleTypes(){
+  if(!AUTH_USER) return;
+  window.USER_VEHICLE_TYPES=await apiFetch("/vehicle_types?select=id,name,created_at&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=created_at.asc")||[];
+  renderVehicleTypeSelect();
+  renderVehicleTypeManager();
+}
+function openVehicleTypes(){
+  renderVehicleTypeManager();
+  const modal=document.getElementById("vehicleTypesModal");
+  modal.classList.add("open");
+  modal.setAttribute("aria-hidden","false");
+  setTimeout(()=>document.getElementById("newVehicleTypeName")?.focus(),50);
+}
+function closeVehicleTypes(){
+  const modal=document.getElementById("vehicleTypesModal");
+  modal.classList.remove("open");
+  modal.setAttribute("aria-hidden","true");
+}
+document.getElementById("vehicleTypesClose")?.addEventListener("click",closeVehicleTypes);
+document.getElementById("vehicleTypesModal")?.addEventListener("click",e=>{if(e.target.id==="vehicleTypesModal")closeVehicleTypes();});
+document.getElementById("addVehicleTypeBtn")?.addEventListener("click",async()=>{
+  const input=document.getElementById("newVehicleTypeName");
+  const status=document.getElementById("vehicleTypesStatus");
+  const name=(input.value||"").trim();
+  if(!name){status.textContent="請先輸入車種名稱";return;}
+  if(name.length>40){status.textContent="車種名稱最多 40 個字";return;}
+  const btn=document.getElementById("addVehicleTypeBtn");
+  btn.disabled=true; status.textContent="新增中…";
+  try{
+    await apiFetch("/vehicle_types",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify({name})
+    });
+    input.value="";
+    await reloadVehicleTypes();
+    status.textContent="已新增："+name;
+  }catch(e){
+    status.textContent=String(e.message||e).includes("duplicate")?"這個車種已經存在":("新增失敗："+(e.message||e));
+  }finally{btn.disabled=false;}
+});
+document.getElementById("newVehicleTypeName")?.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){e.preventDefault();document.getElementById("addVehicleTypeBtn")?.click();}
+});
+document.getElementById("vehicleTypeList")?.addEventListener("click",async e=>{
+  const btn=e.target.closest(".vehicle-type-delete");
+  if(!btn) return;
+  const name=btn.dataset.name||"這個車種";
+  if(!confirm(`確定刪除「${name}」嗎？\n\n舊請款紀錄仍會保留原本車種。`)) return;
+  btn.disabled=true;
+  try{
+    await apiFetch("/vehicle_types?id=eq."+encodeURIComponent(btn.dataset.id),{
+      method:"DELETE",
+      headers:{"Prefer":"return=minimal"}
+    });
+    await reloadVehicleTypes();
+    document.getElementById("vehicleTypesStatus").textContent="已刪除："+name;
+  }catch(e){
+    alert("刪除失敗："+(e.message||e));
+    btn.disabled=false;
+  }
+});
+</script>
+
 <script id="account-menu-v19-script">
 (function(){
   const btn=document.getElementById("accountMenuBtn");
   const panel=document.getElementById("accountMenuPanel");
   const business=document.getElementById("menuBusinessBtn");
+  const vehicleTypes=document.getElementById("menuVehicleTypesBtn");
   const createUser=document.getElementById("menuCreateUserBtn");
   const users=document.getElementById("menuUsersBtn");
   const logout=document.getElementById("menuLogoutBtn");
@@ -1770,6 +2896,7 @@ restoreSavedLogin();
   document.addEventListener("click",closeMenu);
 
   business.addEventListener("click",()=>{closeMenu();document.getElementById("businessSettingsBtn")?.click();});
+  vehicleTypes?.addEventListener("click",()=>{closeMenu();openVehicleTypes();});
   createUser.addEventListener("click",()=>{closeMenu();document.getElementById("adminFab")?.click();});
   users.addEventListener("click",()=>{closeMenu();document.getElementById("adminUsersBtn")?.click();});
   logout.addEventListener("click",()=>{closeMenu();document.getElementById("logoutBtn")?.click();});
@@ -1953,5 +3080,51 @@ restoreSavedLogin();
   });
 })();
 </script>
+
+<script id="v32-duration-buttons-js">
+function syncDurationButtons(){
+  var sel=document.getElementById('duration');
+  if(!sel) return;
+  document.querySelectorAll('#durationButtons button').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.duration===sel.value);
+  });
+}
+function setDurationChoice(value, btn){
+  var sel=document.getElementById('duration');
+  if(!sel) return;
+  sel.value=value;
+  sel.dispatchEvent(new Event('change',{bubbles:true}));
+  syncDurationButtons();
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var sel=document.getElementById('duration');
+  if(sel && !sel.value) sel.value='一天';
+  syncDurationButtons();
+});
+</script>
+
+
+<script id="v33-payment-buttons-js">
+function syncPaymentButtons(){
+  var sel=document.getElementById('payment');
+  if(!sel) return;
+  document.querySelectorAll('#paymentButtons button').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.payment===sel.value);
+  });
+}
+function setPaymentChoice(value, btn){
+  var sel=document.getElementById('payment');
+  if(!sel) return;
+  sel.value=value;
+  sel.dispatchEvent(new Event('change',{bubbles:true}));
+  syncPaymentButtons();
+}
+document.addEventListener('DOMContentLoaded',function(){
+  var sel=document.getElementById('payment');
+  if(sel && !sel.value) sel.value='匯款';
+  syncPaymentButtons();
+});
+</script>
+
 </body>
 </html>
