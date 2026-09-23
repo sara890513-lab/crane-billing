@@ -1368,6 +1368,102 @@ tbody tr:nth-child(even){background:#fbfdff!important}
 }
 </style>
 
+
+<style id="v36-expense-design">
+/* v36：依確認示意圖製作支出管理四欄＋內部滾動 */
+#expenses .expense-table-head{
+  display:grid;
+  grid-template-columns:1.15fr 1.45fr .8fr 1.18fr;
+  gap:8px;
+  align-items:center;
+  padding:12px 14px;
+  background:#eef5fb;
+  border-radius:14px 14px 0 0;
+  color:#13233a;
+  font-weight:900;
+}
+#expenses #financeList{
+  max-height:350px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  border:1px solid #dfe8f1;
+  border-top:0;
+  border-radius:0 0 14px 14px;
+  background:#fff;
+}
+#expenses #financeList .expense-table-row{
+  display:grid!important;
+  grid-template-columns:1.15fr 1.45fr .8fr 1.18fr!important;
+  gap:8px!important;
+  align-items:center!important;
+  padding:13px 14px!important;
+  margin:0!important;
+  border:0!important;
+  border-bottom:1px solid #e5ebf1!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:#fff!important;
+}
+#expenses #financeList .expense-table-row:last-child{border-bottom:0!important}
+#expenses .expense-date{white-space:nowrap}
+#expenses .expense-desc{min-width:0;overflow-wrap:anywhere;line-height:1.4}
+#expenses .expense-amount{justify-self:end;white-space:nowrap;color:#13233a!important;font-weight:950}
+#expenses .expense-actions{display:flex!important;justify-content:flex-end;gap:6px;white-space:nowrap}
+#expenses .expense-actions button{
+  margin:0!important;padding:8px 10px!important;border-radius:999px!important;font-size:12px!important;min-width:0!important
+}
+#expenses .expense-actions .light{background:#eef7ff!important;color:#1472d4!important;border:1px solid #d3e6f8!important}
+#expenses .expense-actions .danger{background:#fff0ef!important;color:#b8322b!important;border:1px solid #f6d6d2!important}
+#expenses #financeTotal{
+  margin-top:0!important;
+  padding:14px!important;
+  background:linear-gradient(90deg,#edf8ff,#f8fcff)!important;
+  border-radius:0 0 16px 16px!important;
+  font-weight:950!important;
+}
+
+@media(max-width:680px){
+  #expenses{padding:16px 14px!important}
+  #expenses .expense-table-head,
+  #expenses #financeList .expense-table-row{
+    grid-template-columns:1.18fr 1.42fr .82fr 1.22fr!important;
+    gap:5px!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+  #expenses .expense-table-head{font-size:12px!important}
+  #expenses #financeList{max-height:330px!important}
+  #expenses .expense-date,#expenses .expense-desc{font-size:11.5px!important}
+  #expenses .expense-amount{font-size:12px!important}
+  #expenses .expense-actions{gap:4px!important}
+  #expenses .expense-actions button{padding:7px 6px!important;font-size:10px!important}
+}
+@media(max-width:390px){
+  #expenses .expense-table-head,
+  #expenses #financeList .expense-table-row{
+    grid-template-columns:1.15fr 1.35fr .78fr 1.25fr!important;
+    gap:4px!important;
+    padding-left:6px!important;padding-right:6px!important;
+  }
+  #expenses .expense-actions button{padding:7px 5px!important;font-size:9.5px!important}
+}
+</style>
+
+
+<style id="v36-1-expense-scroll-bottom-fix">
+/* 讓支出清單最後一筆能完整滑到合計列上方 */
+#expenses #financeList{
+  scroll-padding-bottom:18px!important;
+}
+#expenses #financeList::after{
+  content:"";
+  display:block;
+  height:18px;
+  background:#fff;
+}
+</style>
+
 </head>
 <body class="auth-locked">
 
@@ -1605,7 +1701,8 @@ tbody tr:nth-child(even){background:#fbfdff!important}
     <button class="light" onclick="showFinance('month')">本月</button>
     <button class="light" onclick="showFinance('all')">全部</button>
   </div>
-  <div class="finance-list" id="financeList"></div>
+  <div class="expense-table-head"><span>日期</span><span>支出項目</span><span>金額</span><span>操作</span></div>
+<div class="finance-list" id="financeList"></div>
   <div class="finance-total" id="financeTotal"></div>
 </section>
 
@@ -1799,7 +1896,7 @@ function renderFinance(){
     .filter(e=>scope==='all'||String(e.date||'').startsWith(ym))
     .sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   $('financeList').innerHTML=expenses.length?expenses.map(e=>{
-    return `<div class="finance-row"><span>${esc(e.date||'')}<br>${esc(e.note||e.desc||'支出')}</span><span><b class="finance-out">-${money(expenseAmount(e))}</b><span class="print-hide" style="white-space:nowrap;margin-left:6px"><button class="light" style="padding:5px 8px;font-size:12px" onclick="editExpense(${e._index})">編輯</button> <button class="danger" style="padding:5px 8px;font-size:12px" onclick="delExpense(${e._index})">刪除</button></span></span></div>`;
+    return `<div class="finance-row expense-table-row"><span class="expense-date">${esc(e.date||'')}</span><span class="expense-desc">${esc(e.note||e.desc||'支出')}</span><b class="finance-out expense-amount">-${money(expenseAmount(e))}</b><span class="print-hide expense-actions"><button class="light" onclick="editExpense(${e._index})">編輯</button><button class="danger" onclick="delExpense(${e._index})">刪除</button></span></div>`;
   }).join(''):'<div class="muted">目前沒有支出紀錄</div>';
   const expense=expenses.reduce((s,e)=>s+expenseAmount(e),0);
   $('financeTotal').innerHTML=`<span>支出合計</span><span>${money(expense)}</span>`;
