@@ -1464,6 +1464,1028 @@ tbody tr:nth-child(even){background:#fbfdff!important}
 }
 </style>
 
+
+<style id="v37-collection-ledger-style">
+.collection-card{grid-column:1/-1}
+.collection-title-row h2{margin-bottom:4px}
+.collection-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0}
+.collection-summary>div{padding:15px 17px;border:1px solid #dfe6eb;border-radius:14px;background:#f8fafb}
+.collection-summary span{display:block;color:#6d7882;font-size:13px;font-weight:800}
+.collection-summary strong{display:block;margin-top:5px;font-size:24px}
+#collectionUnpaidTotal{color:#d33}
+.collection-company-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.collection-company-card{width:100%;text-align:left;border:1px solid #dfe6eb;background:#fff;border-radius:15px;padding:16px;cursor:pointer;box-shadow:0 3px 12px #0000000a}
+.collection-company-card:hover{border-color:#91bde1;background:#f8fcff}
+.collection-company-card-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.collection-company-card-name{font-size:17px;font-weight:900;color:#17212b}
+.collection-company-card-count{font-size:12px;color:#6d7882;white-space:nowrap}
+.collection-company-card-money{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid #edf1f3;font-size:13px;color:#6d7882}
+.collection-company-card-money b{font-size:16px;color:#17212b}
+.collection-company-card-money .unpaid b{color:#d33}
+.collection-company-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:15px 0 12px}
+.collection-company-heading h3{font-size:22px;margin:0}
+.collection-company-totals{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:#68737e}
+.collection-company-totals b{font-size:17px;color:#17212b}
+.collection-company-totals .collection-unpaid-text b{color:#d33}
+.collection-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+.collection-tabs button{border:1px solid #d7e0e6;background:#f4f7f9;color:#33414d;border-radius:11px;padding:10px 8px;font-weight:900}
+.collection-tabs button.active{background:#1976d2;color:#fff;border-color:#1976d2}
+.collection-table-head,.collection-record-row{display:grid;grid-template-columns:110px minmax(180px,1fr) 130px 150px;gap:10px;align-items:center}
+.collection-table-head{padding:10px 12px;background:#edf3f7;border:1px solid #dfe6eb;border-radius:11px 11px 0 0;font-size:12px;font-weight:900;color:#56636e}
+.collection-record-list{max-height:390px;overflow-y:auto;border:1px solid #dfe6eb;border-top:0;border-radius:0 0 11px 11px;background:#fff}
+.collection-record-row{padding:11px 12px;border-bottom:1px solid #edf1f3}
+.collection-record-row:last-child{border-bottom:0}
+.collection-record-main{min-width:0}
+.collection-record-main b{display:block;white-space:normal;overflow-wrap:anywhere}
+.collection-record-main small{display:block;color:#7a858e;margin-top:3px}
+.collection-record-amount{font-weight:900}
+.received-toggle{border:0;border-radius:999px;padding:8px 10px;font-size:12px;font-weight:900;cursor:pointer;width:100%}
+.received-toggle.is-received{background:#e8f7ed;color:#168444}
+.received-toggle.is-unreceived{background:#fff0f0;color:#d33}
+.collection-empty{padding:30px;text-align:center;color:#7a858e}
+@media(max-width:700px){
+  .collection-company-list{grid-template-columns:1fr}
+  .collection-summary{grid-template-columns:1fr 1fr}
+  .collection-table-head,.collection-record-row{grid-template-columns:82px minmax(110px,1fr) 90px 100px;gap:6px}
+  .collection-table-head,.collection-record-row{padding-left:8px;padding-right:8px}
+  .collection-record-row{font-size:13px}
+  .received-toggle{padding:7px 5px;font-size:11px}
+  .collection-record-list{max-height:350px}
+}
+</style>
+
+<style id="v37-1-collection-totals-style">
+.collection-summary-all{grid-template-columns:repeat(4,minmax(0,1fr))}
+#collectionReceivedTotal,.collection-received-text b{color:#168444!important}
+@media(max-width:700px){
+ .collection-summary-all{grid-template-columns:1fr 1fr}
+ .collection-summary-all strong{font-size:20px}
+ .collection-company-totals{width:100%;justify-content:space-between}
+}
+</style>
+<!-- v37.4: customer PDF/image export removes the entire 備註 block; website note data remains unchanged -->
+
+<style id="v37-4-export-clean-style">
+/* 客戶請款單匯出：完整移除最下方備註區塊，不影響網站內備註資料 */
+.export-note-row,.customer-export-note,.print-note-row{display:none!important}
+</style>
+
+
+<style id="v37-8-bottom-navigation-style">
+.bottom-main-nav{
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+  z-index:99970;width:min(100%,1050px);
+  display:grid;grid-template-columns:repeat(4,1fr);
+  background:rgba(255,255,255,.97);
+  border-top:1px solid #dbe3e9;
+  box-shadow:0 -5px 20px rgba(20,38,61,.10);
+  padding:6px max(8px,env(safe-area-inset-right))
+          calc(6px + env(safe-area-inset-bottom))
+          max(8px,env(safe-area-inset-left));
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.bottom-main-nav button{
+  appearance:none;border:0;background:transparent;color:#617181;
+  min-height:52px;border-radius:12px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  font-family:inherit;cursor:pointer;
+}
+.bottom-main-nav button span{font-size:21px;line-height:1}
+.bottom-main-nav button b{font-size:12px;line-height:1.25;font-weight:900}
+.bottom-main-nav button.active{background:#eaf3ff;color:#1268bd}
+body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+@media(min-width:901px){
+  .bottom-main-nav{width:min(720px,calc(100% - 28px));border:1px solid #dbe3e9;
+    border-bottom:0;border-radius:18px 18px 0 0}
+}
+@media print{
+  .bottom-main-nav{display:none!important}
+  body{padding-bottom:0!important}
+}
+</style>
+
+
+<style id="v37-8-1-more-menu-fix-style">
+#accountMenuPanel.open{
+  top:auto!important;
+  bottom:calc(74px + env(safe-area-inset-bottom))!important;
+  right:max(14px,env(safe-area-inset-right))!important;
+  max-height:calc(100vh - 110px);
+  overflow-y:auto;
+}
+</style>
+
+<style id="v37-8-2-more-sheet-style">
+.bottom-more-backdrop{display:none;position:fixed;inset:0;z-index:99980;background:rgba(15,25,35,.34);align-items:flex-end;justify-content:center}
+.bottom-more-backdrop.open{display:flex}
+.bottom-more-sheet{width:min(100%,720px);background:#fff;border-radius:22px 22px 0 0;padding:8px 14px calc(88px + env(safe-area-inset-bottom));box-shadow:0 -12px 34px rgba(0,0,0,.18)}
+.bottom-more-handle{width:42px;height:5px;border-radius:999px;background:#d7dde2;margin:2px auto 9px}
+.bottom-more-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 9px;font-size:19px}
+.bottom-more-head button{border:0;background:#eef2f5;border-radius:10px;padding:8px 11px;font-weight:800}
+.bottom-more-sheet>button{display:block;width:100%;min-height:50px;margin:5px 0;border:0;border-radius:13px;background:#f5f7f9;text-align:left;padding:0 15px;font-size:16px;font-weight:850;color:#1d2c3c}
+.bottom-more-sheet>button:active{background:#e8eef3}
+.bottom-more-sheet>button.danger{color:#b42318;background:#fff4f2}
+</style>
+<style id="v37-9-work-menu-style">
+.bottom-work-backdrop{display:none;position:fixed;inset:0;z-index:99979;background:rgba(15,25,35,.34);align-items:flex-end;justify-content:center}
+.bottom-work-backdrop.open{display:flex}
+.bottom-work-sheet{width:min(100%,720px);background:#fff;border-radius:22px 22px 0 0;padding:8px 14px calc(88px + env(safe-area-inset-bottom));box-shadow:0 -12px 34px rgba(0,0,0,.18)}
+.bottom-work-handle{width:42px;height:5px;border-radius:999px;background:#d7dde2;margin:2px auto 9px}
+.bottom-work-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 9px;font-size:19px}
+.bottom-work-head button{border:0;background:#eef2f5;border-radius:10px;padding:8px 11px;font-weight:800}
+.bottom-work-sheet>button{display:flex;width:100%;min-height:62px;margin:7px 0;border:0;border-radius:14px;background:#f5f7f9;text-align:left;padding:10px 15px;font-size:22px;font-weight:850;color:#1d2c3c;align-items:center;gap:12px}
+.bottom-work-sheet>button span{display:flex;flex-direction:column;gap:2px}
+.bottom-work-sheet>button b{font-size:16px}
+.bottom-work-sheet>button small{font-size:12px;font-weight:650;color:#71808d}
+</style>
+<style id="v37-10-accounting-menu-style">
+.bottom-money-backdrop{display:none;position:fixed;inset:0;z-index:99979;background:rgba(15,25,35,.34);align-items:flex-end;justify-content:center}
+.bottom-money-backdrop.open{display:flex}
+.bottom-money-sheet{width:min(100%,720px);background:#fff;border-radius:22px 22px 0 0;padding:8px 14px calc(88px + env(safe-area-inset-bottom));box-shadow:0 -12px 34px rgba(0,0,0,.18)}
+.bottom-money-handle{width:42px;height:5px;border-radius:999px;background:#d7dde2;margin:2px auto 9px}
+.bottom-money-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 9px;font-size:19px}
+.bottom-money-head button{border:0;background:#eef2f5;border-radius:10px;padding:8px 11px;font-weight:800}
+.bottom-money-sheet>button{display:flex;width:100%;min-height:62px;margin:7px 0;border:0;border-radius:14px;background:#f5f7f9;text-align:left;padding:10px 15px;font-size:22px;font-weight:850;color:#1d2c3c;align-items:center;gap:12px}
+.bottom-money-sheet>button span{display:flex;flex-direction:column;gap:2px}
+.bottom-money-sheet>button b{font-size:16px}
+.bottom-money-sheet>button small{font-size:12px;font-weight:650;color:#71808d}
+</style>
+<style id="v37-11-home-cleanup-style">
+.quick-nav.v37-home-hidden{display:none!important}
+#dashboard{margin-top:14px}
+#dashboard .metric{min-height:92px}
+@media(max-width:640px){
+  #dashboard{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  #dashboard .metric{min-width:0!important;padding:13px!important}
+  #dashboard .metric-icon{font-size:22px!important}
+  #dashboard .metric span{font-size:12px!important}
+  #dashboard .metric strong{font-size:19px!important}
+}
+</style>
+<style id="v37-12-real-pages-style">
+/* v37.12: bottom navigation behaves like real pages, not anchors on one long page */
+body.v37-pages-ready main>section{display:none!important}
+body.v37-pages-ready main>section.v37-page-visible{display:block!important}
+body.v37-pages-ready main>section#dashboard.v37-page-visible{display:grid!important}
+</style>
+<style id="v37-12-1-hide-old-top-controls">
+/* Old top controls are now fully replaced by the bottom 更多 menu. */
+#accountMenuBtn,#accountMenuPanel,#adminFab,#adminUsersBtn{display:none!important}
+</style>
+<style id="v37-13-home-expense-style">
+#publicAddUserBtn{display:none!important}
+</style>
+<style id="v37-14-cleanup-style">
+/* 新增使用者只從底部「更多」開啟 */
+#adminModal:not(.open){display:none!important}
+#adminModal.open{display:flex!important}
+/* 登入頁舊的新增使用者入口也不顯示 */
+#publicAddUserBtn{display:none!important}
+</style>
+<style id="v37-17-cards-home-only-style">
+/* 四張收支摘要卡只在首頁顯示 */
+body.v37-non-home #dashboard{display:none!important}
+</style>
+<style id="v37-18-home-final-layout-style">
+/* 首頁最終排列：收支摘要 → 今日工作 → 新增請款 → 支出 */
+body:not(.v37-non-home) #dashboard{order:1}
+body:not(.v37-non-home) #todayPanel{order:2}
+body:not(.v37-non-home) #newRecord{order:3}
+body:not(.v37-non-home) #expenses{order:4}
+body:not(.v37-non-home) main{display:flex;flex-direction:column}
+body:not(.v37-non-home) #dashboard{display:grid!important}
+body:not(.v37-non-home) #todayPanel,
+body:not(.v37-non-home) #newRecord,
+body:not(.v37-non-home) #expenses{display:block!important}
+</style>
+<style id="v37-20-finance-signature-style">
+.finance-v26-card.signature{background:linear-gradient(145deg,#fff8ee,#ffedd6)}
+.finance-v26-card.signature b{color:#b86412!important}
+.finance-v26-grid{align-items:stretch}
+.finance-v26-card{height:100%;box-sizing:border-box}
+@media(min-width:700px){
+  .finance-v26-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:699px){
+  .finance-v26-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .finance-v26-card{min-height:132px!important}
+  .finance-v26-card.signature{grid-column:1 / -1;min-height:108px!important}
+  .finance-v26-card.signature>div:last-child{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px}
+  .finance-v26-card.signature span{width:100%}
+  .finance-v26-card.signature small{margin-top:4px}
+}
+</style>
+<style id="v37-21-finance-balance-layout-style">
+/* 本月結餘改為底部最大重點卡 */
+.finance-v26-card.balance{
+  grid-column:1 / -1!important;
+  min-height:125px!important;
+  background:linear-gradient(145deg,#e9fbf7,#dff7f3)!important;
+}
+.finance-v26-card.balance>div:last-child{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  column-gap:12px;
+}
+.finance-v26-card.balance span{width:100%}
+.finance-v26-card.balance b{font-size:34px!important}
+.finance-v26-card.balance small{margin-top:4px}
+@media(max-width:699px){
+  .finance-v26-card.balance{min-height:118px!important}
+  .finance-v26-card.balance b{font-size:31px!important}
+}
+</style>
+<style id="v37-22-finance-layout-fix-style">
+/* 修正上一版空一格：簽帳與支出並排，結餘獨佔底部最大格 */
+.finance-v26-card.signature{
+  grid-column:auto!important;
+  min-height:150px!important;
+}
+.finance-v26-card.expense{
+  grid-column:auto!important;
+  min-height:150px!important;
+}
+.finance-v26-card.balance{
+  grid-column:1 / -1!important;
+  min-height:165px!important;
+  display:flex!important;
+  align-items:center!important;
+}
+.finance-v26-card.balance b{font-size:38px!important}
+@media(max-width:699px){
+  .finance-v26-card.signature,
+  .finance-v26-card.expense{min-height:142px!important}
+  .finance-v26-card.signature>div:last-child{display:block!important}
+  .finance-v26-card.signature span{width:auto!important}
+  .finance-v26-card.balance{min-height:150px!important}
+  .finance-v26-card.balance b{font-size:34px!important}
+}
+</style>
+<style id="v37-23-invoice-center-style">
+.invoice-center-card .section-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.invoice-center-total{text-align:right;background:#fff7e8;border:1px solid #f2dfba;border-radius:14px;padding:10px 14px;line-height:1.6;white-space:nowrap}
+.invoice-center-list{display:grid;gap:10px;margin-top:14px}
+.invoice-company{border:1px solid #dce5ec;border-radius:16px;padding:14px;background:#fff}
+.invoice-company-head{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.invoice-company-head strong{font-size:18px}.invoice-company-sum{font-weight:900;color:#b86412}
+.invoice-row{display:grid;grid-template-columns:100px 1fr auto;gap:10px;padding:10px 0;border-top:1px solid #edf1f4;align-items:center}
+.invoice-row:first-of-type{margin-top:10px}.invoice-badge{display:inline-block;background:#fff0d6;color:#9a570d;border-radius:999px;padding:5px 9px;font-weight:900}
+.invoice-empty{padding:28px;text-align:center;color:#7a8792}
+@media(max-width:699px){.invoice-center-card .section-head{display:block}.invoice-center-total{text-align:left;margin-top:10px}.invoice-row{grid-template-columns:82px 1fr}.invoice-row .invoice-row-money{grid-column:2}}
+</style>
+<style id="v37-24-invoice-layout-fix-style">
+#invoiceCenter{overflow:hidden}
+#invoiceCenter .section-head{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:14px!important;
+  align-items:center!important;
+  width:100%!important;
+}
+#invoiceCenter .section-head>div:first-child{
+  min-width:0!important;
+  width:auto!important;
+  flex:none!important;
+}
+#invoiceCenter h2{
+  white-space:nowrap!important;
+  font-size:25px!important;
+  line-height:1.25!important;
+}
+#invoiceCenter .section-head .muted{
+  margin-top:5px!important;
+  line-height:1.45!important;
+}
+#invoiceCenter .invoice-center-total{
+  min-width:170px!important;
+  width:auto!important;
+  box-sizing:border-box!important;
+  text-align:left!important;
+  border-radius:16px!important;
+}
+#invoiceCenter .invoice-company{
+  padding:16px!important;
+  border-radius:18px!important;
+}
+#invoiceCenter .invoice-company-head{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:12px!important;
+}
+#invoiceCenter .invoice-company-head strong{
+  display:block!important;
+  font-size:20px!important;
+  line-height:1.35!important;
+  word-break:normal!important;
+  overflow-wrap:anywhere!important;
+}
+#invoiceCenter .invoice-company-sum{
+  white-space:nowrap!important;
+  font-size:18px!important;
+}
+#invoiceCenter .invoice-row{
+  width:100%!important;
+  box-sizing:border-box!important;
+}
+@media(max-width:699px){
+  #invoiceCenter .section-head{
+    display:block!important;
+  }
+  #invoiceCenter h2{font-size:24px!important}
+  #invoiceCenter .invoice-center-total{
+    width:100%!important;
+    min-width:0!important;
+    margin-top:14px!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px 14px!important;
+  }
+  #invoiceCenter .invoice-company-head{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  #invoiceCenter .invoice-company-sum{
+    margin-top:6px!important;
+    font-size:20px!important;
+  }
+  #invoiceCenter .invoice-row{
+    display:grid!important;
+    grid-template-columns:1fr auto!important;
+    gap:7px 10px!important;
+    padding:13px 0!important;
+  }
+  #invoiceCenter .invoice-row>div:first-child{
+    font-weight:800!important;
+  }
+  #invoiceCenter .invoice-row>div:nth-child(2){
+    grid-column:1 / -1!important;
+    line-height:1.5!important;
+  }
+  #invoiceCenter .invoice-row-money{
+    grid-column:1 / -1!important;
+    text-align:left!important;
+  }
+}
+</style>
+<style id="v37-25-invoice-full-width-fix-style">
+/* 待開發票是後來新增的 section，補上主版面的完整寬度設定 */
+main > #invoiceCenter{
+  grid-column:1 / -1!important;
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  box-sizing:border-box!important;
+  justify-self:stretch!important;
+}
+#invoiceCenter *{box-sizing:border-box}
+#invoiceCenter .section-head,
+#invoiceCenter .invoice-center-list,
+#invoiceCenter .invoice-company{width:100%!important;max-width:100%!important;min-width:0!important}
+@media(max-width:699px){
+  main > #invoiceCenter{grid-column:1 / -1!important;width:100%!important}
+}
+</style>
+<style id="v37-26-invoice-completed-style">
+.invoice-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.invoice-tabs button{border:1px solid #d7e1ea;background:#f5f8fb;border-radius:14px;padding:12px 8px;font-weight:900;color:#425466;font-size:16px}
+.invoice-tabs button.active{background:#2f7de8;color:#fff;border-color:#2f7de8}
+.invoice-tabs b{display:inline-block;margin-left:5px}
+.invoice-complete-btn{border:0;background:#e8f7ee;color:#168348;border-radius:12px;padding:9px 12px;font-weight:900;font-size:15px}
+.invoice-complete-btn:active{transform:scale(.98)}
+.invoice-cancel-btn{border:1px solid #d7e1ea;background:#f5f8fb;color:#52606d;border-radius:12px;padding:9px 12px;font-weight:900;font-size:15px}
+.invoice-cancel-btn:active{transform:scale(.98)}
+.invoice-done-badge{display:inline-block;background:#e8f7ee;color:#168348;border-radius:999px;padding:5px 9px;font-weight:900}
+.invoice-row-action{margin-top:8px}
+.invoice-completed-date{display:inline-flex;align-items:center;background:#eef7ff;color:#2367a8;border-radius:999px;padding:5px 9px;font-size:13px;font-weight:850;margin-left:6px}
+</style>
+
+<style id="v37-27-collection-mobile-layout">
+/* 收款帳本－公司明細：手機版排版修正 */
+@media (max-width: 640px){
+  /* 明細頁本身必須完整使用手機寬度，避免左側內容被切掉 */
+  #collectionDetail,
+  #collectionCompanyDetail,
+  .collection-detail,
+  .collection-company-detail{
+    grid-column:1 / -1!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+  #collectionDetail *,
+  #collectionCompanyDetail *,
+  .collection-detail *,
+  .collection-company-detail *{box-sizing:border-box}
+
+  /* 收款帳本卡片不要在手機上留下負 margin / 固定寬度 */
+  #collectionLedger .card,
+  #collectionLedger .section-card,
+  #collectionLedger .collection-card,
+  #collectionDetail .card,
+  #collectionCompanyDetail .card{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  /* 標題與返回鍵 */
+  .collection-detail-head,
+  .collection-company-head,
+  .collection-detail-header{
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    min-width:0!important;
+  }
+  .collection-detail-head > div:first-child,
+  .collection-company-head > div:first-child,
+  .collection-detail-header > div:first-child{
+    min-width:0!important;
+    flex:1 1 auto!important;
+  }
+  .collection-detail-head h2,
+  .collection-company-head h2,
+  .collection-detail-header h2{
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    line-height:1.25!important;
+    margin-bottom:5px!important;
+  }
+  .collection-back-btn,
+  #collectionBackBtn{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:116px!important;
+    padding:9px 11px!important;
+    border-radius:12px!important;
+    font-size:14px!important;
+    line-height:1.25!important;
+    white-space:normal!important;
+  }
+
+  /* 金額摘要三欄 */
+  .collection-detail-totals,
+  .collection-company-totals,
+  .collection-summary-row{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .collection-detail-totals > *,
+  .collection-company-totals > *,
+  .collection-summary-row > *{
+    min-width:0!important;
+    text-align:center!important;
+  }
+  .collection-detail-totals b,
+  .collection-company-totals b,
+  .collection-summary-row b{
+    display:block!important;
+    font-size:19px!important;
+    line-height:1.15!important;
+    white-space:nowrap!important;
+  }
+
+  /* 全部／匯款／現金／簽帳 */
+  .collection-pay-tabs,
+  .collection-detail-tabs,
+  .collection-tabs{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:7px!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .collection-pay-tabs button,
+  .collection-detail-tabs button,
+  .collection-tabs button{
+    min-width:0!important;
+    width:100%!important;
+    padding:10px 4px!important;
+    font-size:15px!important;
+    white-space:nowrap!important;
+  }
+
+  /* 表格維持四欄，但給工作內容較多空間 */
+  .collection-detail-table,
+  .collection-table{
+    width:100%!important;
+    max-width:100%!important;
+    table-layout:fixed!important;
+  }
+  .collection-detail-table th:nth-child(1),
+  .collection-detail-table td:nth-child(1),
+  .collection-table th:nth-child(1),
+  .collection-table td:nth-child(1){width:21%!important}
+  .collection-detail-table th:nth-child(2),
+  .collection-detail-table td:nth-child(2),
+  .collection-table th:nth-child(2),
+  .collection-table td:nth-child(2){width:34%!important}
+  .collection-detail-table th:nth-child(3),
+  .collection-detail-table td:nth-child(3),
+  .collection-table th:nth-child(3),
+  .collection-table td:nth-child(3){width:20%!important}
+  .collection-detail-table th:nth-child(4),
+  .collection-detail-table td:nth-child(4),
+  .collection-table th:nth-child(4),
+  .collection-table td:nth-child(4){width:25%!important}
+  .collection-detail-table th,
+  .collection-detail-table td,
+  .collection-table th,
+  .collection-table td{
+    padding-left:6px!important;
+    padding-right:6px!important;
+    overflow-wrap:anywhere!important;
+  }
+  .collection-detail-table .status-btn,
+  .collection-table .status-btn,
+  .collection-detail-table button,
+  .collection-table td:last-child button{
+    max-width:100%!important;
+    min-width:0!important;
+    padding:8px 6px!important;
+    font-size:14px!important;
+  }
+}
+</style>
+
+
+<style id="v37-28-collection-no-horizontal-scroll">
+@media(max-width:640px){
+  html,body{max-width:100%!important;overflow-x:hidden!important}
+  main{width:100%!important;max-width:100%!important;min-width:0!important}
+  #collectionLedger{
+    grid-column:1/-1!important;
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    overflow:hidden!important;padding:14px!important
+  }
+  #collectionLedger .section-head{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:start!important;gap:8px!important;width:100%!important;min-width:0!important
+  }
+  #collectionLedger .section-head>div{min-width:0!important}
+  #collectionLedger .section-head h2{font-size:22px!important;white-space:nowrap!important}
+  #collectionLedger .section-head .muted{
+    font-size:12px!important;line-height:1.45!important;white-space:normal!important
+  }
+  #collectionBackBtn{
+    max-width:104px!important;padding:8px 9px!important;font-size:13px!important;line-height:1.25!important
+  }
+
+  #collectionDetailView,.collection-company-heading{width:100%!important;max-width:100%!important;min-width:0!important}
+  .collection-company-heading{display:block!important;margin-top:12px!important}
+  .collection-company-heading h3{
+    font-size:20px!important;line-height:1.3!important;margin:0 0 12px!important;
+    overflow-wrap:anywhere!important
+  }
+  .collection-company-totals{
+    display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;width:100%!important
+  }
+  .collection-company-totals span{text-align:center!important;font-size:12px!important;min-width:0!important}
+  .collection-company-totals b{
+    display:block!important;font-size:19px!important;margin-top:3px!important;white-space:nowrap!important
+  }
+  .collection-tabs{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;width:100%!important
+  }
+  .collection-tabs button{min-width:0!important;padding:10px 2px!important;font-size:14px!important}
+
+  /* 手機不再硬塞四欄表格，改成每筆卡片，完全取消左右滑動 */
+  .collection-table-head{display:none!important}
+  .collection-record-list{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    overflow-x:hidden!important;border:0!important;background:transparent!important
+  }
+  .collection-record-row{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-areas:
+      "date amount"
+      "main main"
+      "status status"!important;
+    gap:7px 10px!important;
+    margin-bottom:9px!important;padding:12px!important;
+    border:1px solid #dfe8f1!important;border-radius:14px!important;background:#fff!important
+  }
+  .collection-record-row>span:nth-child(1){grid-area:date!important;font-size:12px!important;color:#68798b!important}
+  .collection-record-main{grid-area:main!important;min-width:0!important}
+  .collection-record-main b{font-size:16px!important}
+  .collection-record-main small{font-size:12px!important}
+  .collection-record-amount{
+    grid-area:amount!important;justify-self:end!important;font-size:17px!important;white-space:nowrap!important
+  }
+  .collection-record-row>button,.collection-record-row>.received-toggle{
+    grid-area:status!important;width:100%!important;max-width:none!important;
+    padding:9px!important;font-size:13px!important
+  }
+}
+</style>
+
+
+<style id="v37-29-status-under-amount">
+@media(max-width:640px){
+  .collection-record-row{
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-areas:
+      "date amount"
+      "main status"!important;
+    align-items:start!important;
+  }
+  .collection-record-row>button,
+  .collection-record-row>.received-toggle{
+    grid-area:status!important;
+    justify-self:end!important;
+    width:150px!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:9px 12px!important;
+  }
+  .collection-record-main{align-self:center!important}
+}
+</style>
+
+<style id="v37-30-received-date-style">
+.received-status-wrap{display:flex;flex-direction:column;align-items:stretch;gap:4px;min-width:0}
+.received-date{display:block;text-align:center;color:#168444;font-size:11px;font-weight:800;white-space:nowrap}
+@media(max-width:640px){
+ .collection-record-row>.received-status-wrap{grid-area:status!important;justify-self:end!important;width:150px!important;max-width:100%!important}
+ .collection-record-row>.received-status-wrap .received-toggle{width:100%!important}
+}
+</style>
+<style id="v37-33-home-reminders-css">
+.home-reminders-v33{grid-column:1/-1!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+.home-reminders-v33-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.home-reminders-v33-grid button{border:1px solid #dce5ec;border-radius:16px;background:#fff;padding:14px 12px;text-align:left;min-width:0}
+.home-reminders-v33-grid button:first-child{background:#fff5f5}
+.home-reminders-v33-grid button:last-child{background:#fff9ed}
+.home-reminders-v33-grid span,.home-reminders-v33-grid b,.home-reminders-v33-grid small{display:block}
+.home-reminders-v33-grid span{font-weight:900;color:#536270}
+.home-reminders-v33-grid b{font-size:20px;margin-top:6px;color:#172536}
+.home-reminders-v33-grid small{font-size:13px;margin-top:4px;color:#71808d;font-weight:800}
+@media(max-width:640px){.home-reminders-v33-grid{gap:8px}.home-reminders-v33-grid button{padding:12px 10px}}
+</style>
+
+<style id="v37-37-invoice-layout-polish">
+/* v37.37：發票管理手機版重新整理資訊層級 */
+@media(max-width:699px){
+  #invoiceCenter{padding:16px 14px!important}
+  #invoiceCenter .section-head{display:block!important}
+  #invoiceCenter .invoice-center-total{
+    margin-top:14px!important;padding:14px 16px!important;display:grid!important;
+    grid-template-columns:1fr auto!important;gap:8px 16px!important;align-items:center!important;
+    background:#fff8e9!important;border:1px solid #f1dcae!important;
+  }
+  #invoiceCenter .invoice-center-total b{font-size:20px!important;text-align:right!important}
+  #invoiceCenter .invoice-tabs{gap:8px!important;margin:14px 0 16px!important}
+  #invoiceCenter .invoice-tabs button{min-height:54px!important;padding:10px 6px!important;font-size:15px!important}
+  #invoiceCenter .invoice-company{padding:16px!important;border-radius:20px!important}
+  #invoiceCenter .invoice-company-head{display:block!important;padding-bottom:13px!important}
+  #invoiceCenter .invoice-company-head strong{font-size:22px!important}
+  #invoiceCenter .invoice-company-head .muted{font-size:13px!important;margin-top:3px!important}
+  #invoiceCenter .invoice-company-sum{margin-top:12px!important;font-size:22px!important}
+  #invoiceCenter .invoice-row{
+    display:grid!important;grid-template-columns:1fr!important;gap:8px!important;
+    padding:14px 0 2px!important;border-top:1px solid #e8eef4!important;
+  }
+  #invoiceCenter .invoice-row>div:first-child{font-size:18px!important;font-weight:900!important}
+  #invoiceCenter .invoice-row>div:nth-child(2){grid-column:auto!important;display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:7px!important;font-size:16px!important}
+  #invoiceCenter .invoice-badge,#invoiceCenter .invoice-done-badge{padding:6px 10px!important;font-size:14px!important}
+  #invoiceCenter .invoice-row-money{grid-column:auto!important;text-align:left!important;margin-top:4px!important}
+  #invoiceCenter .invoice-row-money b{font-size:20px!important}
+  #invoiceCenter .invoice-row-money .muted{font-size:13px!important;margin-top:2px!important}
+  #invoiceCenter .invoice-row-action{width:100%!important;margin-top:4px!important}
+  #invoiceCenter .invoice-complete-btn,#invoiceCenter .invoice-cancel-btn{
+    width:100%!important;min-height:46px!important;padding:10px 12px!important;border-radius:13px!important;font-size:15px!important
+  }
+  #invoiceCenter .invoice-complete-btn{background:#e8f7ee!important;color:#168348!important;border:1px solid #cdebd8!important}
+  #invoiceCenter .invoice-cancel-btn{background:#f4f7fa!important;color:#52606d!important;border:1px solid #d7e1ea!important}
+}
+</style>
+
+<style id="v37-39-customer-master-style">
+.customer-master-card .section-head{align-items:center;gap:12px}
+.customer-master-search{margin:14px 0}
+.customer-master-search input{width:100%;box-sizing:border-box}
+.customer-master-list{display:grid;gap:10px}
+.customer-master-item{border:1px solid #e3e9ef;border-radius:16px;padding:14px;background:#fff}
+.customer-master-item-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.customer-master-item-name{font-size:18px;font-weight:900;color:#263238}
+.customer-master-item-tax{font-size:13px;color:#718096;margin-top:3px}
+.customer-master-item-info{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px;margin-top:12px;font-size:14px;color:#52606d}
+.customer-master-item-note{margin-top:9px;padding-top:9px;border-top:1px dashed #e1e7ec;white-space:pre-wrap;color:#667085;font-size:14px}
+.customer-master-item-actions{display:flex;gap:8px;margin-top:12px}
+.customer-master-item-actions button{flex:1;min-height:42px}
+.customer-master-modal{position:fixed;inset:0;background:rgba(23,31,42,.45);z-index:10050;display:none;align-items:flex-end;justify-content:center;padding:0}
+.customer-master-modal.open{display:flex}
+.customer-master-dialog{background:#fff;width:min(620px,100%);max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:18px 16px 24px;box-sizing:border-box}
+.customer-master-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.customer-master-dialog-head strong{font-size:21px}
+.customer-master-dialog label{display:block;margin-top:11px;margin-bottom:5px;font-weight:800}
+.customer-master-dialog input,.customer-master-dialog textarea{width:100%;box-sizing:border-box}
+.customer-master-actions{display:flex;gap:10px;margin-top:18px}
+.customer-master-actions button{flex:1;min-height:46px}
+@media(max-width:699px){
+  .customer-master-card .section-head{display:flex!important}
+  .customer-master-card .section-head .primary{white-space:nowrap}
+  .customer-master-item-info{grid-template-columns:1fr}
+}
+</style>
+
+
+<style id="v37-40-customer-modal-mobile-fix">
+/* v37.40：iPhone 客戶表單底部按鈕不再被導覽列遮住 */
+.customer-master-modal{
+  align-items:stretch!important;
+}
+.customer-master-dialog{
+  align-self:flex-end!important;
+  max-height:calc(100dvh - 72px)!important;
+  padding-bottom:calc(110px + env(safe-area-inset-bottom))!important;
+  overscroll-behavior:contain;
+}
+.customer-master-actions{
+  position:sticky!important;
+  bottom:0!important;
+  z-index:5!important;
+  margin:18px -16px calc(-110px - env(safe-area-inset-bottom))!important;
+  padding:12px 16px calc(14px + env(safe-area-inset-bottom))!important;
+  background:rgba(255,255,255,.97)!important;
+  border-top:1px solid #e3e9ef!important;
+  box-shadow:0 -8px 22px rgba(30,41,59,.08)!important;
+}
+@media(max-width:699px){
+  .customer-master-dialog{
+    height:calc(100dvh - 76px)!important;
+    max-height:calc(100dvh - 76px)!important;
+    border-radius:22px 22px 0 0!important;
+  }
+  .customer-master-actions button{
+    min-height:50px!important;
+    font-size:16px!important;
+    font-weight:800!important;
+  }
+}
+</style>
+
+
+<style id="v37-41-customer-form-layout-fix">
+/* v37.41：只調整客戶表單排版，不變更任何功能 */
+.customer-master-modal{
+  align-items:flex-end!important;
+  overflow:hidden!important;
+}
+.customer-master-dialog{
+  height:auto!important;
+  max-height:calc(100dvh - 80px)!important;
+  overflow-y:auto!important;
+  -webkit-overflow-scrolling:touch!important;
+  padding:18px 16px calc(105px + env(safe-area-inset-bottom))!important;
+}
+.customer-master-actions{
+  position:static!important;
+  margin:20px 0 0!important;
+  padding:0!important;
+  background:transparent!important;
+  border-top:0!important;
+  box-shadow:none!important;
+}
+@media(max-width:699px){
+  .customer-master-dialog{
+    height:auto!important;
+    max-height:calc(100dvh - 80px)!important;
+  }
+  .customer-master-dialog textarea{
+    min-height:110px!important;
+  }
+  .customer-master-actions{
+    display:flex!important;
+    gap:10px!important;
+  }
+  .customer-master-actions button{
+    flex:1!important;
+    min-height:50px!important;
+  }
+}
+</style>
+
+
+<style id="v37-44-customer-list-layout">
+/* v37.44：只整理客戶資料庫列表，不修改任何功能 */
+.customer-master-card .section-head{align-items:flex-start!important;gap:12px!important}
+.customer-master-search{margin:16px 0!important}
+.customer-master-search input{min-height:48px!important;border-radius:14px!important;padding:11px 14px!important}
+.customer-master-list{gap:12px!important}
+.customer-master-item{
+  padding:16px!important;border-radius:18px!important;
+  box-shadow:0 3px 12px rgba(30,41,59,.05)!important;
+}
+.customer-master-item-name{font-size:20px!important;line-height:1.3!important}
+.customer-master-item-tax{font-size:14px!important;margin-top:5px!important}
+.customer-master-item-info{
+  margin-top:13px!important;padding:11px 12px!important;border-radius:12px!important;
+  background:#f7f9fb!important;line-height:1.5!important;
+}
+.customer-master-item-note{margin-top:11px!important;padding-top:11px!important;line-height:1.5!important}
+.customer-master-item-actions{
+  display:grid!important;grid-template-columns:1fr 1fr!important;
+  gap:8px!important;margin-top:14px!important;
+}
+.customer-master-item-actions button{min-height:44px!important;border-radius:12px!important}
+.customer-master-item-actions button:first-child{
+  grid-column:1/-1!important;min-height:48px!important;font-weight:800!important;
+}
+@media(max-width:699px){
+  .customer-master-card{padding:16px 14px!important}
+  .customer-master-card .section-head{
+    display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  }
+  .customer-master-card .section-head h2{font-size:21px!important}
+  .customer-master-card .section-head .muted{margin-top:4px!important;line-height:1.4!important}
+  .customer-master-card .section-head .primary{
+    min-height:42px!important;padding:8px 12px!important;border-radius:12px!important;
+  }
+  .customer-master-item-info{grid-template-columns:1fr!important}
+}
+</style>
+
+
+<style id="v37-46b-customer-detail-style">
+.customer-detail-dialog{padding-bottom:calc(105px + env(safe-area-inset-bottom))!important}
+.customer-detail-title{font-size:23px;font-weight:900;line-height:1.3;margin:6px 0 14px}
+.customer-detail-info{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.customer-detail-info>div{background:#f7f9fb;border-radius:12px;padding:10px 12px;min-width:0}
+.customer-detail-info span,.customer-detail-note span,.customer-detail-stats span{display:block;color:#718096;font-size:12px;font-weight:800;margin-bottom:3px}
+.customer-detail-info b{font-size:15px;overflow-wrap:anywhere}
+.customer-detail-note{margin-top:10px;padding:11px 12px;border-radius:12px;background:#fff9ec;white-space:pre-wrap;line-height:1.5}
+.customer-detail-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.customer-detail-stats>div{padding:12px 10px;border:1px solid #e3e9ef;border-radius:14px;background:#fff}
+.customer-detail-stats b{font-size:17px;display:block;overflow-wrap:anywhere}
+.customer-detail-stats .unpaid{background:#fff7f7}
+.customer-detail-stats .unpaid b{color:#c23b3b}
+.customer-detail-use{width:100%;min-height:48px;border-radius:13px!important}
+.customer-detail-history-title{font-size:17px;font-weight:900;margin:18px 0 8px}
+.customer-detail-history{display:grid;gap:8px}
+.customer-detail-history-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;padding:12px 0;border-top:1px solid #e8eef4;align-items:start}
+.customer-detail-history-row:first-child{border-top:0}
+.customer-detail-history-row>div:first-child{min-width:0}
+.customer-detail-history-row span{display:block;color:#667085;font-size:13px;margin-top:4px;overflow-wrap:anywhere}
+.customer-detail-history-money{text-align:right;white-space:nowrap}
+.customer-detail-history-money b{font-size:16px}
+.customer-detail-history-money .is-paid{color:#168444;font-weight:800}
+.customer-detail-history-money .is-unpaid{color:#c23b3b;font-weight:800}
+.customer-master-item-actions .customer-detail-btn{grid-column:1/-1!important}
+@media(max-width:699px){
+  .customer-detail-info{grid-template-columns:1fr}
+  .customer-detail-stats{grid-template-columns:1fr 1fr}
+  .customer-detail-stats .unpaid{grid-column:1/-1}
+}
+</style>
+
+
+<style id="v37-47-customer-card-layout">
+/* v37.47：只整理客戶資料庫卡片按鈕排版，功能不變 */
+.customer-master-item-actions{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  gap:9px!important;
+  margin-top:14px!important;
+}
+.customer-master-item-actions button{
+  min-height:46px!important;
+  border-radius:12px!important;
+  margin:0!important;
+}
+.customer-master-item-actions .customer-detail-btn{
+  grid-column:1 / -1!important;
+}
+.customer-master-item-actions button:nth-child(2){
+  grid-column:1 / -1!important;
+}
+.customer-master-item-actions button:nth-child(3){
+  grid-column:1!important;
+}
+.customer-master-item-actions button:nth-child(4){
+  grid-column:2!important;
+}
+@media(max-width:699px){
+  .customer-master-item{
+    padding:16px!important;
+  }
+  .customer-master-item-actions{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .customer-master-item-actions .customer-detail-btn,
+  .customer-master-item-actions button:nth-child(2){
+    min-height:48px!important;
+  }
+}
+</style>
+
+
+<style id="v37-48-customer-history-detail-style">
+.customer-history-clickable{
+  cursor:pointer;
+  padding:13px 10px!important;
+  border-radius:12px;
+  transition:background .15s ease;
+}
+.customer-history-clickable:active{background:#f1f6fb}
+.customer-history-clickable:after{
+  content:"›";
+  align-self:center;
+  font-size:26px;
+  font-weight:800;
+  color:#9aa8b6;
+  margin-left:-4px;
+}
+.customer-history-clickable{
+  grid-template-columns:minmax(0,1fr) auto auto!important;
+}
+.customer-history-record-dialog{
+  padding-bottom:calc(105px + env(safe-area-inset-bottom))!important;
+}
+.customer-history-record-amount{
+  background:#f4f8fc;
+  border-radius:15px;
+  padding:14px;
+  margin:5px 0 12px;
+}
+.customer-history-record-amount span,
+.customer-history-record-grid span{
+  display:block;
+  color:#718096;
+  font-size:12px;
+  font-weight:800;
+  margin-bottom:4px;
+}
+.customer-history-record-amount b{font-size:24px}
+.customer-history-record-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.customer-history-record-grid>div{
+  min-width:0;
+  padding:11px 12px;
+  border:1px solid #e5ebf0;
+  border-radius:12px;
+  background:#fff;
+}
+.customer-history-record-grid b{
+  display:block;
+  font-size:15px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+  white-space:pre-wrap;
+}
+@media(max-width:699px){
+  .customer-history-record-grid{grid-template-columns:1fr}
+}
+</style>
+
+
+<style id="v37-49-customer-history-navigation-style">
+.customer-history-record-head{
+  display:grid!important;
+  grid-template-columns:auto 1fr auto!important;
+  align-items:center!important;
+  gap:8px!important;
+}
+.customer-history-record-head strong{
+  text-align:center!important;
+  font-size:18px!important;
+}
+.customer-history-back{
+  min-height:40px!important;
+  padding:7px 10px!important;
+  white-space:nowrap!important;
+}
+@media(max-width:699px){
+  .customer-history-record-head{
+    grid-template-columns:1fr auto!important;
+  }
+  .customer-history-record-head strong{
+    grid-row:2;
+    grid-column:1/-1;
+    text-align:left!important;
+    font-size:21px!important;
+    margin-top:5px;
+  }
+  .customer-history-back{
+    justify-self:start;
+  }
+}
+</style>
+
 </head>
 <body class="auth-locked">
 
@@ -1586,22 +2608,33 @@ tbody tr:nth-child(even){background:#fbfdff!important}
   </div>
   <div class="brand-emoji">🚜</div>
 </header>
-<nav class="quick-nav">
+<nav class="quick-nav v37-home-hidden">
+  <a href="#dashboard">🏠 首頁</a>
+  <a href="#todayPanel">📌 今日工作</a>
   <a href="#newRecord">🧾 新增請款</a>
   <a href="#monthlyWork">📅 每月工作</a>
   <a href="#expenses">💸 支出</a>
   <a href="#finance">📊 本月收支</a>
+  <a href="#collectionLedger">💰 收款帳本</a>
   <a href="#customers">👤 客戶帳本</a>
   <a href="#recordsSection">📋 請款紀錄</a>
 </nav>
 <main>
 <section class="dashboard" id="dashboard">
 <div class="metric income"><div class="metric-icon">💵</div><div><span>本月收入（未稅）</span><strong id="dashIncome">$0</strong></div></div>
-<div class="metric tax"><div class="metric-icon">🧮</div><div><span>總稅金</span><strong id="dashTax">$0</strong></div></div>
+<div class="metric tax home-unreceived"><div class="metric-icon">💰</div><div><span>未收款</span><strong id="dashUnreceived">$0</strong></div></div><strong id="dashTax" style="display:none">$0</strong>
 <div class="metric expense"><div class="metric-icon">🧾</div><div><span>本月支出</span><strong id="dashExpense">$0</strong></div></div>
 <div class="metric balance"><div class="metric-icon">📈</div><div><span>本月淨收入（未稅）</span><strong id="dashBalance">$0</strong></div></div>
-<div class="metric jobs"><div class="metric-icon">🚜</div><div><span>本月工作筆數</span><strong id="dashJobs">0 筆</strong></div></div>
+<strong id="dashJobs" style="display:none">0 筆</strong>
 </section>
+<section class="card home-reminders-v33" id="homeRemindersV33">
+  <div class="section-head"><div><h2 style="margin:0">🔔 待處理提醒</h2><div class="muted">點一下直接查看</div></div></div>
+  <div class="home-reminders-v33-grid">
+    <button type="button" onclick="openUnpaidV33()"><span>💰 未收款</span><b id="homeUnpaidCountV33">0 筆</b><small id="homeUnpaidAmountV33">$0</small></button>
+    <button type="button" onclick="openInvoiceV33()"><span>🧾 待開發票</span><b id="homeInvoiceCountV33">0 筆</b><small id="homeInvoiceAmountV33">$0</small></button>
+  </div>
+</section>
+
 <section class="card today-card" id="todayPanel"><div class="section-head"><h2>🚜 今日工作</h2><span class="date-chip" id="todayDateLabel"></span></div><div id="todayWorkList" class="today-list"></div></section>
 
 
@@ -1642,6 +2675,20 @@ tbody tr:nth-child(even){background:#fbfdff!important}
   </div>
   <div class="muted" style="margin-top:7px">計算方式：未稅金額 × 5% = 稅額；未稅金額 + 稅額 = 含稅金額。</div>
 </div>
+<div class="full"><label>工作加註（可複選）</label>
+<div class="work-option-buttons" id="workOptionButtons">
+<button type="button" data-option="副桿" onclick="toggleWorkOption('副桿')">副桿</button>
+<button type="button" data-option="吊籃" onclick="toggleWorkOption('吊籃')">吊籃</button>
+<button type="button" data-option="助手" onclick="toggleWorkOption('助手')">助手</button>
+</div><input id="workOptions" type="hidden" value="">
+<div class="muted" style="margin-top:6px">可不選，也可以同時選擇兩個以上。</div></div><div><label>發票</label><div class="invoice-buttons" id="invoiceButtons">
+  <button type="button" data-invoice="開發票" onclick="setInvoiceChoice('開發票')">開發票</button>
+  <button type="button" data-invoice="不開發票" onclick="setInvoiceChoice('不開發票')">不開發票</button>
+</div>
+<select id="invoiceStatus" style="display:none" aria-hidden="true">
+  <option value="開發票">開發票</option>
+  <option value="不開發票" selected>不開發票</option>
+</select></div>
 <div><label>收款方式</label><div class="payment-buttons" id="paymentButtons">
   <button type="button" data-payment="匯款" onclick="setPaymentChoice('匯款', this)">匯款</button>
   <button type="button" data-payment="簽帳" onclick="setPaymentChoice('簽帳', this)">簽帳</button>
@@ -1732,6 +2779,10 @@ tbody tr:nth-child(even){background:#fbfdff!important}
       <div class="finance-v26-icon">💵</div>
       <div><span>本月現金（未稅）</span><b id="monthCash">$0</b><small>現金收款</small></div>
     </div>
+    <div class="finance-v26-card signature">
+      <div class="finance-v26-icon">✍️</div>
+      <div><span>本月簽帳（未稅）</span><b id="monthSignature">$0</b><small>尚未現金／匯款收款</small></div>
+    </div>
     <div class="finance-v26-card expense">
       <div class="finance-v26-icon">🧾</div>
       <div><span>本月支出</span><b id="monthExpense">$0</b><small>營運支出／成本</small></div>
@@ -1748,6 +2799,111 @@ tbody tr:nth-child(even){background:#fbfdff!important}
     <button type="button" onclick="setMonth(1)">下月 ›</button>
   </div>
 </section>
+
+
+<section class="card collection-card" id="collectionLedger">
+  <div class="section-head collection-title-row">
+    <div>
+      <h2>💰 收款帳本</h2>
+      <div class="muted">依公司查看匯款、現金、簽帳，以及已收款／未收款</div>
+    </div>
+    <button type="button" class="light" id="collectionBackBtn" style="display:none" onclick="closeCollectionCompany()">← 返回公司列表</button>
+  </div>
+
+  <div id="collectionCompanyView">
+    <div class="collection-summary collection-summary-all">
+      <div><span>全部公司總金額</span><strong id="collectionGrandTotal">$0</strong></div>
+      <div><span>已收款總金額</span><strong id="collectionReceivedTotal">$0</strong></div>
+      <div><span>未收款總金額</span><strong id="collectionUnpaidTotal">$0</strong></div>
+      <div><span>公司數</span><strong id="collectionCompanyCount">0</strong></div>
+    </div>
+    <div class="collection-company-tools">
+  <div class="collection-shortcuts" id="collectionShortcuts">
+    <button type="button" class="active" data-filter="全部" onclick="setCollectionCompanyFilter('全部')">全部</button>
+    <button type="button" data-filter="未收款" onclick="setCollectionCompanyFilter('未收款')">未收款</button>
+    <button type="button" data-filter="已收款" onclick="setCollectionCompanyFilter('已收款')">已收款</button>
+  </div>
+  <input id="collectionCompanySearch" class="collection-company-search" type="search" placeholder="🔍 搜尋公司" oninput="setCollectionCompanySearch(this.value)">
+</div>
+<div class="collection-company-scroll">
+  <div id="collectionCompanyList" class="collection-company-list"></div>
+</div>
+  </div>
+
+  <div id="collectionDetailView" style="display:none">
+    <div class="collection-company-heading">
+      <h3 id="collectionCompanyName"></h3>
+      <div class="collection-company-totals">
+        <span>總金額 <b id="collectionCompanyTotal">$0</b></span>
+        <span class="collection-received-text">已收款 <b id="collectionCompanyReceived">$0</b></span>
+        <span class="collection-unpaid-text">未收款 <b id="collectionCompanyUnpaid">$0</b></span>
+      </div>
+    </div>
+    <div class="collection-tabs" id="collectionTabs">
+      <button type="button" class="active" data-kind="全部" onclick="setCollectionKind('全部')">全部</button>
+      <button type="button" data-kind="匯款" onclick="setCollectionKind('匯款')">匯款</button>
+      <button type="button" data-kind="現金" onclick="setCollectionKind('現金')">現金</button>
+      <button type="button" data-kind="簽帳" onclick="setCollectionKind('簽帳')">簽帳</button>
+    </div>
+    <div class="collection-table-head"><span>日期</span><span>工作內容</span><span>金額</span><span>收款狀態</span></div>
+    <div id="collectionRecordList" class="collection-record-list"></div>
+  </div>
+</section>
+
+
+<section class="card manage-card customer-master-card" id="customerMaster">
+  <div class="section-head">
+    <div><h2 style="margin:0">👥 客戶資料庫</h2><div class="muted">常用客戶資料集中管理，新增請款時可快速帶入</div></div>
+    <button type="button" class="primary" onclick="openCustomerMasterForm()">＋ 新增客戶</button>
+  </div>
+  <div class="customer-master-search">
+    <input id="customerMasterSearch" placeholder="🔍 搜尋公司名稱、統編、聯絡人或電話" oninput="renderCustomerMaster()">
+  </div>
+  <div id="customerMasterList" class="customer-master-list"></div>
+</section>
+
+
+
+<div id="customerHistoryRecordModal" class="customer-master-modal customer-history-record-modal print-hide" aria-hidden="true">
+  <div class="customer-master-dialog customer-history-record-dialog">
+    <div class="customer-master-dialog-head customer-history-record-head">
+      <button type="button" class="light customer-history-back" onclick="backToCustomerDetail()">← 返回客戶詳情</button>
+      <strong>工作紀錄詳情</strong>
+      <button type="button" class="light" onclick="closeCustomerHistoryRecord()">關閉</button>
+    </div>
+    <div id="customerHistoryRecordBody"></div>
+  </div>
+</div>
+
+<div id="customerDetailModal" class="customer-master-modal customer-detail-modal print-hide" aria-hidden="true">
+  <div class="customer-master-dialog customer-detail-dialog">
+    <div class="customer-master-dialog-head">
+      <strong>客戶詳情</strong>
+      <button type="button" class="light" onclick="closeCustomerDetail()">關閉</button>
+    </div>
+    <div id="customerDetailBody"></div>
+  </div>
+</div>
+
+<div id="customerMasterModal" class="customer-master-modal print-hide" aria-hidden="true">
+  <div class="customer-master-dialog">
+    <div class="customer-master-dialog-head">
+      <strong id="customerMasterFormTitle">新增客戶</strong>
+      <button type="button" class="light" onclick="closeCustomerMasterForm()">關閉</button>
+    </div>
+    <input id="customerMasterId" type="hidden">
+    <label>公司名稱 *</label><input id="customerMasterCompany" placeholder="例如：○○工程有限公司">
+    <label>統一編號</label><input id="customerMasterTax" inputmode="numeric" placeholder="8碼統編">
+    <label>聯絡人</label><input id="customerMasterContact" placeholder="例如：王先生">
+    <label>電話</label><input id="customerMasterPhone" type="tel" placeholder="例如：0912-345-678">
+    <label>地址</label><input id="customerMasterAddress" placeholder="公司地址">
+    <label>備註</label><textarea id="customerMasterNote" rows="3" placeholder="付款方式、聯絡事項等"></textarea>
+    <div class="customer-master-actions">
+      <button type="button" class="light" onclick="closeCustomerMasterForm()">取消</button>
+      <button type="button" class="primary" id="customerMasterSaveBtn" onclick="saveCustomerMaster()">儲存客戶</button>
+    </div>
+  </div>
+</div>
 
 <section class="card manage-card" id="customers">
 <h2>客戶帳本</h2>
@@ -1770,6 +2926,15 @@ tbody tr:nth-child(even){background:#fbfdff!important}
 </section>
 <div id="customerLedgerPrint"></div>
 
+<section class="card invoice-center-card" id="invoiceCenter">
+<div class="section-head"><div><h2 style="margin:0">🧾 發票管理</h2><div class="muted">查看待開與已完成的發票</div></div>
+<div class="invoice-center-total">未稅合計 <b id="invoiceCenterEx">$0</b><br>含稅合計 <b id="invoiceCenterInc">$0</b></div></div>
+<div class="invoice-tabs">
+  <button type="button" id="invoicePendingTab" class="active" onclick="setInvoiceCenterMode('pending')">待開發票 <b id="invoicePendingCount">0</b></button>
+  <button type="button" id="invoiceDoneTab" onclick="setInvoiceCenterMode('done')">✓ 已開發票 <b id="invoiceDoneCount">0</b></button>
+</div>
+<div id="invoiceCenterList" class="invoice-center-list"></div>
+</section>
 <section class="card" id="recordsSection">
 <div class="section-head" style="align-items:end;gap:12px;flex-wrap:wrap">
   <h2 id="recordsTitle" style="margin:0">請款紀錄</h2>
@@ -1778,7 +2943,7 @@ tbody tr:nth-child(even){background:#fbfdff!important}
     <input id="recordsMonthSelect" type="month" onchange="changeRecordsMonth(this.value)">
   </div>
 </div>
-<div class="table-wrap"><table><thead><tr><th>日期</th><th>客戶</th><th>統編</th><th>地點</th><th>工作內容</th><th>時間</th><th>加班</th><th>車種</th><th>未稅</th><th>稅額5%</th><th>含稅</th><th>收款方式</th><th>備註</th><th class="print-hide">操作</th></tr></thead>
+<div class="table-wrap"><table><thead><tr><th>日期</th><th>客戶</th><th>統編</th><th>地點</th><th>工作內容</th><th>時間</th><th>加班</th><th>車種</th><th>未稅</th><th>稅額5%</th><th>含稅</th><th>收款方式</th><th class="print-hide">操作</th></tr></thead>
 <tbody id="records"></tbody></table><div id="empty" class="empty">目前沒有紀錄</div></div>
 <div class="total">含稅合計：<span id="total">$0</span></div>
 <div class="actions print-hide"><button class="danger" onclick="deleteAll()">清除全部資料</button></div>
@@ -1800,7 +2965,7 @@ function migrateState(){
     return s;
   }catch(e){return {records:[],expenses:[]}}
 }
-let state={records:[],expenses:[]};
+let state={records:[],expenses:[],customers:[]};
 let filterCustomer="";
 let viewMonth=new Date().toISOString().slice(0,7);
 let editIndex=-1;
@@ -1813,21 +2978,22 @@ $("expenseDate").value=today();
 function resetForm(){setTimeout(syncPaymentButtons,0);setTimeout(syncDurationButtons,0);
  editIndex=-1;$('formTitle').textContent='新增請款紀錄';$('cancelEdit').style.display='none';
  ['customer','tax','location','work','overtime','amountEx','taxAmount','amountInc','note'].forEach(id=>$(id).value='');
- $('date').value=selectedDay||today();if($('truck').options.length)$('truck').selectedIndex=0;$('duration').value='一天';$('payment').value='匯款';$('mapLink').innerHTML='';
+ $('date').value=selectedDay||today();if($('truck').options.length)$('truck').selectedIndex=0;$('duration').value='一天';$('payment').value='匯款';$('invoiceStatus').value='不開發票';setWorkOptions([]);setTimeout(syncInvoiceButtons,0);$('mapLink').innerHTML='';
 }
 function round2(n){return Math.round((Number(n)||0)*100)/100}
 function updateTax(){let ex=Number($('amountEx').value)||0;let tax=round2(ex*0.05);let inc=round2(ex+tax);$('taxAmount').value=tax?tax:'';$('amountInc').value=inc?inc:''}
 function addRecord(){
  updateTax();
  const ex=round2($('amountEx').value);const tax=round2($('taxAmount').value);const inc=round2($('amountInc').value);
- const r={type:'income',customer:$('customer').value.trim(),tax:$('tax').value.trim(),date:$('date').value,truck:$('truck').value,location:$('location').value.trim(),work:$('work').value.trim(),duration:$('duration').value,overtime:Number($('overtime').value)||0,amountEx:ex,taxAmount:tax,amountInc:inc,amount:inc,payment:$('payment').value,note:$('note').value.trim()};
+ const r={type:'income',customer:$('customer').value.trim(),tax:$('tax').value.trim(),date:$('date').value,truck:$('truck').value,location:$('location').value.trim(),work:$('work').value.trim(),duration:$('duration').value,overtime:Number($('overtime').value)||0,amountEx:ex,taxAmount:tax,amountInc:inc,amount:inc,payment:$('payment').value,note:$('note').value.trim(),received:false,invoice_status:$('invoiceStatus').value,
+    invoice_completed:false,work_options:getWorkOptions()};
  if(!r.customer||!r.date||!r.work||!ex){alert('請填寫客戶名稱、日期、工作內容及未稅金額');return}
  if(editIndex>=0) state.records[editIndex]=r; else state.records.unshift(r);calendarMonth=r.date.slice(0,7);viewMonth=r.date.slice(0,7);save();resetForm();renderCalendar();
 }
 function editRecord(i){
  let r=state.records[i];editIndex=i;$('formTitle').textContent='修改請款紀錄';$('cancelEdit').style.display='inline-block';
  ['customer','tax','date','truck','location','work','duration','overtime','note'].forEach(id=>$(id).value=r[id]??'');
- $('amountEx').value=r.amountEx??round2((Number(r.amount)||0)/1.05);$('taxAmount').value=r.taxAmount??round2((Number(r.amount)||0)-Number($('amountEx').value));$('amountInc').value=r.amountInc??r.amount??'';$('payment').value=r.payment||'匯款';renderMapLink(r.location);window.scrollTo({top:0,behavior:'smooth'});
+ $('amountEx').value=r.amountEx??round2((Number(r.amount)||0)/1.05);$('taxAmount').value=r.taxAmount??round2((Number(r.amount)||0)-Number($('amountEx').value));$('amountInc').value=r.amountInc??r.amount??'';$('payment').value=r.payment||'匯款';$('invoiceStatus').value=r.invoice_status||'不開發票';setWorkOptions(r.work_options||[]);setTimeout(syncInvoiceButtons,0);renderMapLink(r.location);window.scrollTo({top:0,behavior:'smooth'});
 }
 function delRecord(i){if(confirm('確定刪除這筆紀錄？')){state.records.splice(i,1);save()}}
 function addExpense(){let d=prompt('支出日期（YYYY-MM-DD）',today());if(!d)return;let desc=prompt('支出內容');if(!desc)return;let amt=Number(prompt('支出金額','0'));if(!amt)return;state.expenses.unshift({date:d,desc,amount:amt});save()}
@@ -2098,7 +3264,7 @@ function updateDashboard(){
   }).join('');
   $('todayWorkList').innerHTML=out||'<div class="today-empty">今天尚未登錄工作或支出</div>';
 }
-function renderAll(){renderStats();renderRecords();renderCustomers();renderFinance();renderCalendar();updateDashboard()}
+function renderAll(){renderStats();renderRecords();renderCustomers();renderFinance();renderCalendar();updateDashboard();renderCollectionLedger();renderHomeRemindersV33()}
 function renderStats(){
   const monthLabel=document.getElementById('financeMonthLabel');
   const monthButton=document.getElementById('financeMonthButton');
@@ -2111,11 +3277,13 @@ function renderStats(){
   const taxTotal=monthRecords.reduce((a,r)=>a+taxValue(r),0);
   const transfer=monthRecords.filter(r=>r.payment==='匯款').reduce((a,r)=>a+untaxed(r),0);
   const cash=monthRecords.filter(r=>r.payment==='現金').reduce((a,r)=>a+untaxed(r),0);
+  const signature=monthRecords.filter(r=>r.payment==='簽帳').reduce((a,r)=>a+untaxed(r),0);
   const exp=state.expenses.filter(r=>String(r.date||'').slice(0,7)===viewMonth).reduce((a,r)=>a+(Number(r.amount)||0),0);
   $('monthIncome').textContent=money(inc);
   $('monthTaxTotal').textContent=money(taxTotal);
   $('monthTransfer').textContent=money(transfer);
   $('monthCash').textContent=money(cash);
+  $('monthSignature').textContent=money(signature);
   $('monthExpense').textContent=money(exp);
   $('monthBalance').textContent=money(inc-exp);
 }
@@ -2204,8 +3372,9 @@ function buildCustomerLedger(name){
       <td>${esc((r.work||'')+(r.location?'／'+r.location:''))}</td>
       <td>${esc(ledgerTimeText(r)||'—')}</td>
       <td>${esc(r.truck||'—')}</td>
+      <td>${esc((Array.isArray(r.work_options)?r.work_options:[]).join('、'))}</td>
       <td class="money">${money(r.amountEx??0)}</td>
-      <td>${esc(r.note||'')}</td>
+      
     </tr>`).join('');
 
   const blankCount=Math.max(0,12-arr.length);
@@ -2239,11 +3408,11 @@ function buildCustomerLedger(name){
       <table class="customer-a4-table">
         <colgroup>
           <col style="width:14%">
-          <col style="width:31%">
+          <col style="width:29%">
+          <col style="width:11%">
           <col style="width:12%">
-          <col style="width:13%">
           <col style="width:15%">
-          <col style="width:15%">
+          <col style="width:19%">
         </colgroup>
         <thead>
           <tr>
@@ -2251,8 +3420,9 @@ function buildCustomerLedger(name){
             <th>工作內容 / 地點</th>
             <th>時間</th>
             <th>車種</th>
+            <th>加註</th>
             <th>未稅金額</th>
-            <th>備註</th>
+            
           </tr>
         </thead>
         <tbody>${rows}${blankRows}</tbody>
@@ -2264,8 +3434,7 @@ function buildCustomerLedger(name){
         <tr><td class="label">合計</td><td class="value"><b>${money(total)}</b></td></tr>
       </table>
 
-      <div class="customer-a4-note">
-        <div class="label">備註</div>
+      
         <div class="space"></div>
       </div>
     </div>`;
@@ -2450,7 +3619,8 @@ function cloudRecord(r){
   return {customer:r.customer||"",tax:r.tax||"",date:r.date||null,truck:r.truck||"",
     location:r.location||"",work:r.work||"",duration:r.duration||"",overtime:Number(r.overtime)||0,
     amountEx:Number(r.amountEx)||0,taxAmount:Number(r.taxAmount)||0,
-    amountInc:Number(r.amountInc??r.amount)||0,payment:r.payment||"",note:r.note||""};
+    amountInc:Number(r.amountInc??r.amount)||0,payment:r.payment||"",note:r.note||"",received:!!r.received,received_date:r.received_date||null,invoice_status:r.invoice_status||"不開發票",
+    invoice_completed:!!r.invoice_completed,invoice_completed_date:r.invoice_completed_date||null,work_options:Array.isArray(r.work_options)?r.work_options:[]};
 }
 function cloudExpense(e){return {date:e.date||null,desc:e.note||e.desc||"",amount:Number(e.amount)||0}}
 function fromCloudRecord(r){return {...r,type:"income",amount:Number(r.amountInc)||0}}
@@ -2458,10 +3628,11 @@ function fromCloudExpense(e){return {...e,note:e.desc||""}}
 
 async function loadCloud(){
   try{
-    const [records,expenses,vehicleTypes]=await Promise.all([
+    const [records,expenses,vehicleTypes,customers]=await Promise.all([
       apiFetch("/records?select=*&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=date.desc,created_at.desc"),
       apiFetch("/expenses?select=*&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=date.desc,created_at.desc"),
-      apiFetch("/vehicle_types?select=id,name,created_at&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=created_at.asc")
+      apiFetch("/vehicle_types?select=id,name,created_at&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=created_at.asc"),
+      apiFetch("/customers?select=*&user_id=eq."+encodeURIComponent(AUTH_USER.id)+"&order=company_name.asc,created_at.desc")
     ]);
     window.USER_VEHICLE_TYPES=vehicleTypes||[];
     renderVehicleTypeSelect();
@@ -2469,6 +3640,7 @@ async function loadCloud(){
     state.expenses=[];
     state.records=(records||[]).map(fromCloudRecord);
     state.expenses=(expenses||[]).map(fromCloudExpense);
+    state.customers=customers||[];
     // v2 測試版不會把登入前的本機資料自動寫回 Supabase。
     localStorage.setItem(KEY+"_backup_"+AUTH_USER.id,JSON.stringify(state));
     renderAll();
@@ -2486,6 +3658,7 @@ async function doLogin(username,password){
   AUTH_USER=null;
   state.records=[];
   state.expenses=[];
+  state.customers=[];
   document.getElementById("adminFab").style.display="none";
   document.getElementById("adminUsersBtn").style.display="none";
   document.getElementById("adminModal").style.display="none";
@@ -2732,11 +3905,15 @@ addRecord=async function(){
   const r={type:'income',customer:$('customer').value.trim(),tax:$('tax').value.trim(),date:$('date').value,
     truck:$('truck').value,location:$('location').value.trim(),work:$('work').value.trim(),
     duration:$('duration').value,overtime:Number($('overtime').value)||0,amountEx:ex,taxAmount:tax,
-    amountInc:inc,amount:inc,payment:$('payment').value,note:$('note').value.trim()};
+    amountInc:inc,amount:inc,payment:$('payment').value,note:$('note').value.trim(),received:false,invoice_status:$('invoiceStatus').value,work_options:getWorkOptions()};
   if(!r.customer||!r.date||!r.work||!ex){alert('請填寫客戶名稱、日期、工作內容及未稅金額');return}
   try{
     if(editIndex>=0 && state.records[editIndex]?.id){
       const id=state.records[editIndex].id;
+      r.received=!!state.records[editIndex].received;
+      r.received_date=state.records[editIndex].received_date||null;
+      r.invoice_completed=!!state.records[editIndex].invoice_completed;
+      r.invoice_completed_date=state.records[editIndex].invoice_completed_date||null;
       await apiFetch("/records?id=eq."+encodeURIComponent(id),{method:"PATCH",
         headers:{"Prefer":"return=minimal"},body:JSON.stringify(cloudRecord(r))});
     }else{
@@ -3046,6 +4223,271 @@ document.getElementById("vehicleTypeList")?.addEventListener("click",async e=>{
 })();
 </script>
 
+
+<script id="customer-master-v37-39-script">
+(function(){
+  function customerRows(){ return Array.isArray(state.customers) ? state.customers : []; }
+  window.renderCustomerMaster=function(){
+    const box=document.getElementById("customerMasterList");
+    if(!box) return;
+    const q=(document.getElementById("customerMasterSearch")?.value||"").trim().toLowerCase();
+    const rows=customerRows().filter(c=>{
+      if(!q) return true;
+      return [c.company_name,c.tax_id,c.contact_name,c.phone,c.address,c.note]
+        .some(v=>String(v||"").toLowerCase().includes(q));
+    });
+    if(!rows.length){
+      box.innerHTML='<div class="empty">'+(q?'找不到符合的客戶':'尚未建立客戶資料，按「＋ 新增客戶」開始建立')+'</div>';
+      return;
+    }
+    box.innerHTML=rows.map(c=>{
+      const info=[];
+      if(c.contact_name) info.push('<span>👤 '+esc(c.contact_name)+'</span>');
+      if(c.phone) info.push('<span>📞 '+esc(c.phone)+'</span>');
+      if(c.address) info.push('<span>📍 '+esc(c.address)+'</span>');
+      return '<div class="customer-master-item">'+
+        '<div class="customer-master-item-head"><div><div class="customer-master-item-name">'+esc(c.company_name||"")+'</div>'+
+        '<div class="customer-master-item-tax">'+(c.tax_id?'統編：'+esc(c.tax_id):'未填統編')+'</div></div></div>'+
+        (info.length?'<div class="customer-master-item-info">'+info.join("")+'</div>':'')+
+        (c.note?'<div class="customer-master-item-note">'+esc(c.note)+'</div>':'')+
+        '<div class="customer-master-item-actions">'+
+          '<button type="button" class="light customer-detail-btn" data-customer-id="'+esc(c.id)+'" onclick="openCustomerDetailFromButton(this)">查看詳情</button>'+
+          '<button type="button" class="light" onclick="useCustomerMasterForRecord(\''+String(c.id).replace(/'/g,"\\'")+'\')">帶入請款</button>'+
+          '<button type="button" class="light" onclick="openCustomerMasterForm(\''+String(c.id).replace(/'/g,"\\'")+'\')">修改</button>'+
+          '<button type="button" class="danger" onclick="deleteCustomerMaster(\''+String(c.id).replace(/'/g,"\\'")+'\')">刪除</button>'+
+        '</div></div>';
+    }).join("");
+  };
+
+
+
+  window.openCustomerHistoryRecord=function(row){
+    const id=row ? (row.getAttribute("data-record-id")||"") : "";
+    const r=(state.records||[]).find(x=>String(x.id)===String(id));
+    if(!r) return;
+
+    const amount=Number(r.amountInc??r.amount)||0;
+    const rows=[
+      ["日期",r.date||""],
+      ["客戶名稱",r.customer||""],
+      ["統編",r.tax||""],
+      ["工作內容",r.work||""],
+      ["工作地點",r.location||""],
+      ["車種",r.vehicle||r.vehicleType||""],
+      ["時間",r.time||""],
+      ["付款方式",r.payment||r.payment_method||""],
+      ["發票",r.invoice_status||""],
+      ["收款狀態",r.received?"已收款":"未收款"],
+      ["備註",r.note||""]
+    ].filter(x=>String(x[1]||"").trim()!=="");
+
+    document.getElementById("customerHistoryRecordBody").innerHTML=
+      '<div class="customer-history-record-amount"><span>請款金額</span><b>'+money(amount)+'</b></div>'+
+      '<div class="customer-history-record-grid">'+
+      rows.map(x=>'<div><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>').join("")+
+      '</div>';
+
+    const detailModal=document.getElementById("customerDetailModal");
+    if(detailModal){
+      detailModal.classList.remove("open");
+      detailModal.setAttribute("aria-hidden","true");
+    }
+    const modal=document.getElementById("customerHistoryRecordModal");
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+  };
+
+  window.closeCustomerHistoryRecord=function(){
+    const modal=document.getElementById("customerHistoryRecordModal");
+    if(!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+  };
+
+  window.backToCustomerDetail=function(){
+    closeCustomerHistoryRecord();
+    const detailModal=document.getElementById("customerDetailModal");
+    if(detailModal){
+      detailModal.classList.add("open");
+      detailModal.setAttribute("aria-hidden","false");
+    }
+  };
+
+  window.openCustomerDetailFromButton=function(btn){
+    if(!btn) return;
+    openCustomerDetail(btn.getAttribute("data-customer-id")||"");
+  };
+
+  window.openCustomerDetail=function(id){
+    const c=customerRows().find(x=>String(x.id)===String(id));
+    if(!c) return;
+
+    const company=String(c.company_name||"").trim().toLowerCase();
+    const taxId=String(c.tax_id||"").trim();
+    const records=(state.records||[]).filter(r=>{
+      const recordTax=String(r.tax||"").trim();
+      const recordName=String(r.customer||"").trim().toLowerCase();
+      return (taxId && recordTax===taxId) || (company && recordName===company);
+    }).sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+
+    const total=records.reduce((sum,r)=>sum+(Number(r.amountInc??r.amount)||0),0);
+    const unpaid=records.filter(r=>!r.received)
+      .reduce((sum,r)=>sum+(Number(r.amountInc??r.amount)||0),0);
+
+    const info=[];
+    if(c.tax_id) info.push('<div><span>統編</span><b>'+esc(c.tax_id)+'</b></div>');
+    if(c.contact_name) info.push('<div><span>聯絡人</span><b>'+esc(c.contact_name)+'</b></div>');
+    if(c.phone) info.push('<div><span>電話</span><b>'+esc(c.phone)+'</b></div>');
+    if(c.address) info.push('<div><span>公司地址</span><b>'+esc(c.address)+'</b></div>');
+
+    const history=records.length ? records.map(r=>{
+      const amount=Number(r.amountInc??r.amount)||0;
+      const sub=[r.work||"未填工作內容",r.location||""].filter(Boolean).map(esc).join(" · ");
+      return '<div class="customer-detail-history-row customer-history-clickable" data-record-id="'+esc(r.id)+'" onclick="openCustomerHistoryRecord(this)">'+
+        '<div><b>'+esc(r.date||"")+'</b><span>'+sub+'</span></div>'+
+        '<div class="customer-detail-history-money"><b>'+money(amount)+'</b>'+
+        '<span class="'+(r.received?'is-paid':'is-unpaid')+'">'+(r.received?'已收款':'未收款')+'</span></div>'+
+      '</div>';
+    }).join("") : '<div class="empty">目前沒有這位客戶的歷史工作紀錄</div>';
+
+    const body=document.getElementById("customerDetailBody");
+    body.innerHTML=
+      '<div class="customer-detail-title">'+esc(c.company_name||"")+'</div>'+
+      (info.length?'<div class="customer-detail-info">'+info.join("")+'</div>':'')+
+      (c.note?'<div class="customer-detail-note"><span>備註</span>'+esc(c.note)+'</div>':'')+
+      '<div class="customer-detail-stats">'+
+        '<div><span>歷史工作</span><b>'+records.length+' 筆</b></div>'+
+        '<div><span>累計請款</span><b>'+money(total)+'</b></div>'+
+        '<div class="unpaid"><span>目前未收款</span><b>'+money(unpaid)+'</b></div>'+
+      '</div>'+
+      '<button type="button" class="primary customer-detail-use" data-customer-id="'+esc(c.id)+'" onclick="useCustomerFromDetail(this)">＋ 帶入新增請款</button>'+
+      '<div class="customer-detail-history-title">歷史工作紀錄</div>'+
+      '<div class="customer-detail-history">'+history+'</div>';
+
+    const modal=document.getElementById("customerDetailModal");
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+  };
+
+  window.useCustomerFromDetail=function(btn){
+    const id=btn ? (btn.getAttribute("data-customer-id")||"") : "";
+    closeCustomerDetail();
+    useCustomerMasterForRecord(id);
+  };
+
+  window.closeCustomerDetail=function(){
+    const modal=document.getElementById("customerDetailModal");
+    if(!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+  };
+
+  window.openCustomerMasterForm=function(id){
+    const c=id?customerRows().find(x=>String(x.id)===String(id)):null;
+    document.getElementById("customerMasterFormTitle").textContent=c?"修改客戶":"新增客戶";
+    document.getElementById("customerMasterId").value=c?.id||"";
+    document.getElementById("customerMasterCompany").value=c?.company_name||"";
+    document.getElementById("customerMasterTax").value=c?.tax_id||"";
+    document.getElementById("customerMasterContact").value=c?.contact_name||"";
+    document.getElementById("customerMasterPhone").value=c?.phone||"";
+    document.getElementById("customerMasterAddress").value=c?.address||"";
+    document.getElementById("customerMasterNote").value=c?.note||"";
+    const modal=document.getElementById("customerMasterModal");
+    modal.classList.add("open"); modal.setAttribute("aria-hidden","false");
+  };
+  window.closeCustomerMasterForm=function(){
+    const modal=document.getElementById("customerMasterModal");
+    modal.classList.remove("open"); modal.setAttribute("aria-hidden","true");
+  };
+  window.saveCustomerMaster=async function(){
+    const id=document.getElementById("customerMasterId").value;
+    const payload={
+      company_name:document.getElementById("customerMasterCompany").value.trim(),
+      tax_id:document.getElementById("customerMasterTax").value.trim(),
+      contact_name:document.getElementById("customerMasterContact").value.trim(),
+      phone:document.getElementById("customerMasterPhone").value.trim(),
+      address:document.getElementById("customerMasterAddress").value.trim(),
+      note:document.getElementById("customerMasterNote").value.trim()
+    };
+    if(!payload.company_name){ alert("請輸入公司名稱"); return; }
+
+    // v37.50 客戶防重複：修改自己時不計入比對
+    const normalizeName=v=>String(v||"").trim().replace(/\s+/g,"").toLowerCase();
+    const normalizeTax=v=>String(v||"").replace(/\D/g,"");
+    const duplicate=customerRows().find(c=>{
+      if(id && String(c.id)===String(id)) return false;
+      const sameTax=normalizeTax(payload.tax_id) && normalizeTax(c.tax_id)===normalizeTax(payload.tax_id);
+      const sameName=normalizeName(payload.company_name) && normalizeName(c.company_name)===normalizeName(payload.company_name);
+      return sameTax || sameName;
+    });
+    if(duplicate){
+      const reasons=[];
+      if(normalizeTax(payload.tax_id) && normalizeTax(duplicate.tax_id)===normalizeTax(payload.tax_id)) reasons.push("統編相同");
+      if(normalizeName(duplicate.company_name)===normalizeName(payload.company_name)) reasons.push("公司名稱相同");
+      alert("這個客戶可能已經建立過了。\n\n既有客戶："+(duplicate.company_name||"未命名")+
+            (duplicate.tax_id?"\n統編："+duplicate.tax_id:"")+
+            "\n原因："+reasons.join("、")+
+            "\n\n請先修改原本的客戶資料，避免建立重複客戶。");
+      return;
+    }
+
+    const btn=document.getElementById("customerMasterSaveBtn");
+    btn.disabled=true; btn.textContent="儲存中…";
+    try{
+      if(id){
+        const rows=await apiFetch("/customers?id=eq."+encodeURIComponent(id),{
+          method:"PATCH",headers:{"Content-Type":"application/json","Prefer":"return=representation"},
+          body:JSON.stringify(payload)
+        });
+        const idx=state.customers.findIndex(x=>String(x.id)===String(id));
+        if(idx>=0 && rows?.[0]) state.customers[idx]=rows[0];
+      }else{
+        const rows=await apiFetch("/customers",{
+          method:"POST",headers:{"Content-Type":"application/json","Prefer":"return=representation"},
+          body:JSON.stringify(payload)
+        });
+        if(rows?.[0]) state.customers.push(rows[0]);
+      }
+      state.customers.sort((a,b)=>String(a.company_name||"").localeCompare(String(b.company_name||""),"zh-Hant"));
+      closeCustomerMasterForm(); renderCustomerMaster();
+    }catch(e){ alert("儲存失敗："+e.message); }
+    finally{ btn.disabled=false; btn.textContent="儲存客戶"; }
+  };
+  window.deleteCustomerMaster=async function(id){
+    const c=customerRows().find(x=>String(x.id)===String(id));
+    if(!c || !confirm("確定刪除「"+c.company_name+"」的客戶資料？\n原本的請款紀錄不會被刪除。")) return;
+    try{
+      await apiFetch("/customers?id=eq."+encodeURIComponent(id),{method:"DELETE",headers:{"Prefer":"return=minimal"}});
+      state.customers=state.customers.filter(x=>String(x.id)!==String(id));
+      renderCustomerMaster();
+    }catch(e){ alert("刪除失敗："+e.message); }
+  };
+  window.useCustomerMasterForRecord=function(id){
+    const c=customerRows().find(x=>String(x.id)===String(id)); if(!c) return;
+    document.getElementById("customer").value=c.company_name||"";
+    document.getElementById("tax").value=c.tax_id||"";
+    const locationInput=document.getElementById("location");
+    if(locationInput) locationInput.value="";
+    if(typeof showV37Page==="function") showV37Page("newRecord");
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+
+  const oldRenderAll=window.renderAll || renderAll;
+  if(typeof oldRenderAll==="function"){
+    window.renderAll=function(){ const v=oldRenderAll.apply(this,arguments); try{renderCustomerMaster();}catch(e){} return v; };
+  }
+  document.addEventListener("click",e=>{
+    const modal=document.getElementById("customerMasterModal");
+    const detail=document.getElementById("customerDetailModal");
+    const historyRecord=document.getElementById("customerHistoryRecordModal");
+    if(e.target===modal) closeCustomerMasterForm();
+    if(e.target===detail) closeCustomerDetail();
+    if(e.target===historyRecord) closeCustomerHistoryRecord();
+  });
+  setTimeout(()=>{ try{renderCustomerMaster();}catch(e){} },0);
+})();
+</script>
+
 <script id="company-taxid-v21-script">
 (function(){
   const input = document.getElementById("customer");
@@ -3065,7 +4507,13 @@ document.getElementById("vehicleTypeList")?.addEventListener("click",async e=>{
   function choose(item){
     input.value = item.name || input.value;
     tax.value = item.taxId || "";
-    status.textContent = item.taxId ? "已自動帶入統編：" + item.taxId : "";
+    if(item.type==="master"){
+      const parts=[];
+      if(item.taxId) parts.push("統編");
+      status.textContent=parts.length ? "已從客戶資料庫帶入："+parts.join("、") : "已選擇客戶資料庫資料";
+    }else{
+      status.textContent = item.taxId ? "已自動帶入統編：" + item.taxId : "";
+    }
     hideResults();
   }
 
@@ -3073,16 +4521,17 @@ document.getElementById("vehicleTypeList")?.addEventListener("click",async e=>{
     try{
       const q = name.trim().toLowerCase();
       const seen = new Set();
-      return (state.records || [])
-        .filter(r => r && r.customer && r.tax &&
-          String(r.customer).toLowerCase().includes(q))
-        .map(r => ({name:String(r.customer), taxId:String(r.tax), type:"history"}))
-        .filter(x => {
-          const k=x.name+"|"+x.taxId;
-          if(seen.has(k)) return false;
-          seen.add(k); return true;
-        })
-        .slice(0,8);
+      const master=(state.customers||[])
+        .filter(c=>c && c.company_name && String(c.company_name).toLowerCase().includes(q))
+        .map(c=>({name:String(c.company_name),taxId:String(c.tax_id||""),address:String(c.address||""),type:"master"}));
+      const history=(state.records || [])
+        .filter(r => r && r.customer && r.tax && String(r.customer).toLowerCase().includes(q))
+        .map(r => ({name:String(r.customer), taxId:String(r.tax), type:"history"}));
+      return master.concat(history).filter(x => {
+        const k=x.name+"|"+x.taxId;
+        if(seen.has(k)) return false;
+        seen.add(k); return true;
+      }).slice(0,8);
     }catch(e){ return []; }
   }
 
@@ -3093,7 +4542,7 @@ document.getElementById("vehicleTypeList")?.addEventListener("click",async e=>{
       const b=document.createElement("button");
       b.type="button";
       b.className="company-lookup-item";
-      const source=item.type==="history" ? "帳本舊客戶" :
+      const source=item.type==="master" ? "客戶資料庫" : item.type==="history" ? "帳本舊客戶" :
                    item.type==="business" ? "商業登記" : "公司登記";
       b.innerHTML="<strong></strong><span></span>";
       b.querySelector("strong").textContent=item.name || "";
@@ -3119,7 +4568,13 @@ document.getElementById("vehicleTypeList")?.addEventListener("click",async e=>{
     const exact=history.find(x=>x.name.trim()===name);
     if(exact){
       tax.value=exact.taxId;
-      status.textContent="已從客戶帳本帶入統編："+exact.taxId;
+      if(exact.type==="master"){
+        const parts=[];
+        if(exact.taxId) parts.push("統編");
+        status.textContent=parts.length ? "已從客戶資料庫帶入："+parts.join("、") : "已找到客戶資料庫資料";
+      }else{
+        status.textContent="已從客戶帳本帶入統編："+exact.taxId;
+      }
       if(history.length>1) render(history);
       return;
     }
@@ -3201,6 +4656,150 @@ document.addEventListener('DOMContentLoaded',function(){
 </script>
 
 
+
+<script id="v37-collection-ledger-js">
+let collectionCompany="";
+let collectionKind="全部";
+
+function collectionAmount(r){
+  return Number(r.amountInc ?? r.amount ?? 0) || 0;
+}
+function collectionRecordsForCompany(){
+  let arr=(state.records||[]).filter(r=>r.customer===collectionCompany);
+  if(collectionKind!=="全部") arr=arr.filter(r=>(r.payment||"")===collectionKind);
+  return arr.sort((a,b)=>String(b.date||"").localeCompare(String(a.date||"")));
+}
+function openCollectionCompany(name){
+  collectionCompany=name;
+  collectionKind="全部";
+  document.getElementById("collectionCompanyView").style.display="none";
+  document.getElementById("collectionDetailView").style.display="block";
+  document.getElementById("collectionBackBtn").style.display="inline-block";
+  renderCollectionLedger();
+  document.getElementById("collectionLedger").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function closeCollectionCompany(){
+  collectionCompany="";
+  collectionKind="全部";
+  document.getElementById("collectionCompanyView").style.display="block";
+  document.getElementById("collectionDetailView").style.display="none";
+  document.getElementById("collectionBackBtn").style.display="none";
+  renderCollectionLedger();
+}
+function setCollectionKind(kind){
+  collectionKind=kind;
+  renderCollectionLedger();
+}
+function localISODate(){
+  const d=new Date(), y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
+  return y+"-"+m+"-"+day;
+}
+function displayReceivedDate(v){
+  if(!v)return "";
+  const p=String(v).split("-");
+  return p.length===3 ? p[0]+"/"+p[1]+"/"+p[2] : String(v);
+}
+async function toggleReceived(recordId,nextValue){
+  if(!recordId){alert("這筆資料尚未同步到雲端，請重新整理後再試");return}
+  const receivedDate=nextValue?localISODate():null;
+  try{
+    await apiFetch("/records?id=eq."+encodeURIComponent(recordId),{
+      method:"PATCH",
+      headers:{"Prefer":"return=minimal"},
+      body:JSON.stringify({received:!!nextValue,received_date:receivedDate})
+    });
+    const r=(state.records||[]).find(x=>x.id===recordId);
+    if(r){r.received=!!nextValue;r.received_date=receivedDate}
+    renderCollectionLedger();
+  }catch(err){
+    alert("收款狀態更新失敗：\n"+err.message);
+  }
+}
+let collectionCompanyFilter="全部";
+let collectionCompanySearch="";
+function setCollectionCompanyFilter(filter){
+  collectionCompanyFilter=filter||"全部";
+  renderCollectionLedger();
+}
+function setCollectionCompanySearch(value){
+  collectionCompanySearch=(value||"").trim().toLowerCase();
+  renderCollectionLedger();
+}
+function renderCollectionLedger(){
+  const companyList=document.getElementById("collectionCompanyList");
+  if(!companyList) return;
+
+  const records=(state.records||[]);
+  const grouped={};
+  records.forEach(r=>{
+    const name=(r.customer||"未命名客戶").trim()||"未命名客戶";
+    (grouped[name]||(grouped[name]=[])).push(r);
+  });
+  const allCompanies=Object.keys(grouped).sort((a,b)=>a.localeCompare(b,"zh-Hant"));
+  const companies=allCompanies.filter(name=>{
+    const arr=grouped[name]||[];
+    const statusOK=collectionCompanyFilter==="全部" ||
+      (collectionCompanyFilter==="未收款" && arr.some(r=>!r.received)) ||
+      (collectionCompanyFilter==="已收款" && arr.some(r=>!!r.received));
+    const searchOK=!collectionCompanySearch || name.toLowerCase().includes(collectionCompanySearch);
+    return statusOK && searchOK;
+  });
+
+  document.querySelectorAll("#collectionShortcuts button").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.filter===collectionCompanyFilter);
+  });
+
+  const grandAll=records.reduce((sum,r)=>sum+collectionAmount(r),0);
+  const receivedAll=records.filter(r=>!!r.received).reduce((sum,r)=>sum+collectionAmount(r),0);
+  const unpaidAll=records.filter(r=>!r.received).reduce((sum,r)=>sum+collectionAmount(r),0);
+  document.getElementById("collectionGrandTotal").textContent=money(grandAll);
+  document.getElementById("collectionReceivedTotal").textContent=money(receivedAll);
+  document.getElementById("collectionUnpaidTotal").textContent=money(unpaidAll);
+  document.getElementById("collectionCompanyCount").textContent=allCompanies.length;
+
+  companyList.innerHTML=companies.length?companies.map(name=>{
+    const arr=grouped[name];
+    const total=arr.reduce((sum,r)=>sum+collectionAmount(r),0);
+    const unpaid=arr.filter(r=>!r.received).reduce((sum,r)=>sum+collectionAmount(r),0);
+    return `<button type="button" class="collection-company-card" onclick='openCollectionCompany(${JSON.stringify(name)})'>
+      <div class="collection-company-card-top">
+        <span class="collection-company-card-name">${esc(name)}</span>
+        <span class="collection-company-card-count">${arr.length} 筆</span>
+      </div>
+      <div class="collection-company-card-money">
+        <span>總金額<br><b>${money(total)}</b></span>
+        <span class="unpaid">未收款<br><b>${money(unpaid)}</b></span>
+      </div>
+    </button>`;
+  }).join(""):'<div class="collection-empty">目前沒有符合條件的公司</div>';
+
+  if(!collectionCompany || !grouped[collectionCompany]){
+    if(collectionCompany && !grouped[collectionCompany]) closeCollectionCompany();
+    return;
+  }
+
+  document.getElementById("collectionCompanyName").textContent=collectionCompany;
+
+  document.querySelectorAll("#collectionTabs button").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.kind===collectionKind);
+  });
+
+  const arr=collectionRecordsForCompany();
+  document.getElementById("collectionCompanyTotal").textContent=money(arr.reduce((s,r)=>s+collectionAmount(r),0));
+  document.getElementById("collectionCompanyReceived").textContent=money(arr.filter(r=>!!r.received).reduce((s,r)=>s+collectionAmount(r),0));
+  document.getElementById("collectionCompanyUnpaid").textContent=money(arr.filter(r=>!r.received).reduce((s,r)=>s+collectionAmount(r),0));
+  document.getElementById("collectionRecordList").innerHTML=arr.length?arr.map(r=>{
+    const received=!!r.received;
+    return `<div class="collection-record-row">
+      <span>${esc(r.date||"")}</span>
+      <span class="collection-record-main"><b>${esc(r.work||"")}</b><small>${esc(r.payment||"未設定")} ・ ${esc(r.invoice_status||"不開發票")}</small></span>
+      <span class="collection-record-amount">${money(collectionAmount(r))}</span>
+      <span class="received-status-wrap"><button type="button" class="received-toggle ${received?"is-received":"is-unreceived"}" onclick='toggleReceived(${JSON.stringify(r.id||"")},${received?"false":"true"})'>${received?"✓ 已收款":"未收款"}</button>${received&&r.received_date?`<small class="received-date">收款 ${displayReceivedDate(r.received_date)}</small>`:""}</span>
+    </div>`;
+  }).join(""):'<div class="collection-empty">這個分類目前沒有紀錄</div>';
+}
+</script>
+
 <script id="v33-payment-buttons-js">
 function syncPaymentButtons(){
   var sel=document.getElementById('payment');
@@ -3223,5 +4822,1237 @@ document.addEventListener('DOMContentLoaded',function(){
 });
 </script>
 
+
+<style id="v37-2-invoice-style">
+.invoice-buttons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.invoice-buttons button{border:1px solid #cfd9e1;background:#f4f7f9;color:#34424e;border-radius:11px;padding:11px 8px;font-weight:900}
+.invoice-buttons button.active{background:#1976d2;color:#fff;border-color:#1976d2}
+</style>
+<script id="v37-2-invoice-js">
+function syncInvoiceButtons(){
+  var sel=document.getElementById('invoiceStatus');
+  if(!sel) return;
+  document.querySelectorAll('#invoiceButtons button').forEach(function(btn){
+    btn.classList.toggle('active',btn.dataset.invoice===sel.value);
+  });
+}
+function setInvoiceChoice(value){
+  var sel=document.getElementById('invoiceStatus');
+  if(!sel) return;
+  sel.value=value;
+  syncInvoiceButtons();
+}
+document.addEventListener('DOMContentLoaded',function(){syncInvoiceButtons();});
+</script>
+
+<style id="v37-5-work-options-style">
+.work-option-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.work-option-buttons button{border:1px solid #cfd9e1;background:#f4f7f9;color:#34424e;border-radius:11px;padding:11px 8px;font-weight:900}
+.work-option-buttons button.active{background:#1976d2;color:#fff;border-color:#1976d2}
+</style>
+<script id="v37-5-work-options-js">
+function getWorkOptions(){const v=document.getElementById('workOptions')?.value||'';return v?v.split('|').filter(Boolean):[]}
+function setWorkOptions(values){const arr=Array.isArray(values)?values:[];const el=document.getElementById('workOptions');if(el)el.value=arr.join('|');document.querySelectorAll('#workOptionButtons button').forEach(b=>b.classList.toggle('active',arr.includes(b.dataset.option)))}
+function toggleWorkOption(value){const arr=getWorkOptions(),i=arr.indexOf(value);if(i>=0)arr.splice(i,1);else arr.push(value);setWorkOptions(arr)}
+document.addEventListener('DOMContentLoaded',()=>setWorkOptions([]));
+</script>
+<style id="v37-6-collection-scroll-shortcuts-style">
+.collection-company-tools{
+  position:sticky;top:0;z-index:3;background:#fff;
+  padding:4px 0 10px;display:grid;gap:9px;
+}
+.collection-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.collection-shortcuts button{
+  min-height:44px;border:1px solid #d7e0e7;background:#f5f8fa;color:#253342;
+  border-radius:12px;font-weight:900;font-size:15px;
+}
+.collection-shortcuts button.active{background:#1976d2;color:#fff;border-color:#1976d2}
+.collection-company-search{
+  width:100%;min-height:44px;border:1px solid #d7e0e7;border-radius:12px;
+  padding:10px 13px;background:#fff;font-size:16px;box-sizing:border-box;
+}
+.collection-company-scroll{
+  max-height:560px;overflow-y:auto;overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;padding:2px 4px 18px 0;
+  scrollbar-gutter:stable;
+}
+@media(max-width:700px){
+  .collection-company-scroll{max-height:520px}
+  .collection-company-list{grid-template-columns:1fr!important}
+}
+</style>
+
+<div id="bottomMoneySheet" class="bottom-money-backdrop print-hide" aria-hidden="true">
+  <div class="bottom-money-sheet" role="dialog" aria-modal="true" aria-label="帳務">
+    <div class="bottom-money-handle"></div>
+    <div class="bottom-money-head"><strong>💰 帳務</strong><button type="button" onclick="closeBottomMoney()">關閉</button></div>
+    <button type="button" onclick="bottomMoneyGo('collectionLedger')">💰 <span><b>收款帳本</b><small>管理已收款與未收款</small></span></button>
+    <button type="button" onclick="bottomMoneyGo('finance')">📊 <span><b>本月收支</b><small>查看收入、稅金、匯款、現金、支出與結餘</small></span></button>
+    <button type="button" onclick="bottomMoneyGo('invoiceCenter')">🧾 <span><b>待開發票</b><small>查看要開發票的公司與金額</small></span></button>
+    <button type="button" onclick="bottomMoneyGo('customerMaster')">👥 <span><b>客戶資料庫</b><small>管理公司、統編與聯絡資料</small></span></button>
+    <button type="button" onclick="bottomMoneyGo('customers')">👤 <span><b>客戶帳本</b><small>搜尋客戶與匯出帳本</small></span></button>
+    <button type="button" onclick="bottomMoneyGo('recordsSection')">📋 <span><b>請款紀錄</b><small>查看過去的請款資料</small></span></button>
+  </div>
+</div>
+<div id="bottomWorkSheet" class="bottom-work-backdrop print-hide" aria-hidden="true">
+  <div class="bottom-work-sheet" role="dialog" aria-modal="true" aria-label="工作">
+    <div class="bottom-work-handle"></div>
+    <div class="bottom-work-head"><strong>📅 工作</strong><button type="button" onclick="closeBottomWork()">關閉</button></div>
+    <button type="button" onclick="bottomWorkGo('monthlyWork')">📅 <span><b>每月工作</b><small>查看整月工作行程</small></span></button>
+  </div>
+</div>
+<div id="bottomMoreSheet" class="bottom-more-backdrop print-hide" aria-hidden="true">
+  <div class="bottom-more-sheet" role="dialog" aria-modal="true" aria-label="更多功能">
+    <div class="bottom-more-handle"></div>
+    <div class="bottom-more-head"><strong>☰ 更多</strong><button type="button" onclick="closeBottomMore()">關閉</button></div>
+    <button type="button" onclick="bottomMoreAction('business')">⚙️ 更改工程行名稱</button>
+    <button type="button" onclick="bottomMoreAction('vehicle')">🚜 車種管理</button>
+    <button type="button" onclick="bottomMoreAction('guide')">📖 使用說明</button>
+    <button type="button" class="bottom-more-admin" onclick="bottomMoreAction('create')">👑 新增使用者</button>
+    <button type="button" class="bottom-more-admin" onclick="bottomMoreAction('users')">👥 使用者管理</button>
+    <button type="button" class="danger" onclick="bottomMoreAction('logout')">🚪 登出</button>
+  </div>
+</div>
+
+
+<div id="userGuideModal" class="user-guide-backdrop print-hide" aria-hidden="true">
+  <div class="user-guide-sheet" role="dialog" aria-modal="true" aria-label="使用說明">
+    <div class="user-guide-head">
+      <div>
+        <strong id="userGuideTitle">📖 使用說明</strong>
+        <small id="userGuideSubtitle">想做什麼？點一下就會教你</small>
+      </div>
+      <button type="button" onclick="closeUserGuide()">關閉</button>
+    </div>
+    <div class="user-guide-content">
+      <div id="userGuideHome" class="user-guide-home">
+        <button type="button" onclick="startFirstUseTour()"><span>🚀</span><b>第一次使用</b><small>第一次設定與建立請款</small></button>
+        <button type="button" onclick="startNewRecordTour()"><span>🧾</span><b>新增請款</b><small>直接到頁面一步一步介紹</small></button>
+        <button type="button" onclick="startReceiveTour()"><span>💰</span><b>收到款項</b><small>直接到收款帳本一步一步介紹</small></button>
+        <button type="button" onclick="startInvoiceTour()"><span>📄</span><b>開發票</b><small>直接到發票管理一步一步介紹</small></button>
+        <button type="button" onclick="startCustomerTour()"><span>👥</span><b>客戶資料庫</b><small>直接到客戶資料庫一步一步介紹</small></button>
+        <button type="button" onclick="startOtherTour()"><span>⚙️</span><b>其他功能</b><small>工作、支出、本月收支與設定</small></button>
+      </div>
+      <div id="userGuideTopic" class="user-guide-topic" hidden></div>
+    </div>
+  </div>
+</div>
+
+
+
+<div id="firstUseTourOverlay" class="tour-overlay print-hide" aria-hidden="true">
+ <div id="firstUseTourSpotlight" class="tour-spotlight"></div>
+ <div id="firstUseTourCard" class="tour-card">
+  <div class="tour-progress" id="firstUseTourProgress"></div>
+  <strong id="firstUseTourTitle"></strong><p id="firstUseTourText"></p>
+  <div class="tour-actions"><button type="button" class="tour-skip" onclick="endFirstUseTour()">跳過教學</button>
+   <div><button type="button" class="tour-prev" id="firstUseTourPrev" onclick="firstUseTourPrev()">上一步</button>
+   <button type="button" class="tour-next" id="firstUseTourNext" onclick="firstUseTourNext()">下一步</button></div>
+  </div>
+ </div>
+</div>
+<div id="otherTourOverlay" class="tour-overlay print-hide" aria-hidden="true">
+ <div id="otherTourSpotlight" class="tour-spotlight"></div>
+ <div id="otherTourCard" class="tour-card">
+  <div class="tour-progress" id="otherTourProgress"></div>
+  <strong id="otherTourTitle"></strong><p id="otherTourText"></p>
+  <div class="tour-actions"><button type="button" class="tour-skip" onclick="endOtherTour()">跳過教學</button>
+   <div><button type="button" class="tour-prev" id="otherTourPrev" onclick="otherTourPrev()">上一步</button>
+   <button type="button" class="tour-next" id="otherTourNext" onclick="otherTourNext()">下一步</button></div>
+  </div>
+ </div>
+</div>
+<div id="customerTourOverlay" class="tour-overlay print-hide" aria-hidden="true">
+ <div id="customerTourSpotlight" class="tour-spotlight"></div>
+ <div id="customerTourCard" class="tour-card">
+  <div class="tour-progress" id="customerTourProgress"></div>
+  <strong id="customerTourTitle"></strong><p id="customerTourText"></p>
+  <div class="tour-actions"><button type="button" class="tour-skip" onclick="endCustomerTour()">跳過教學</button>
+   <div><button type="button" class="tour-prev" id="customerTourPrev" onclick="customerTourPrev()">上一步</button>
+   <button type="button" class="tour-next" id="customerTourNext" onclick="customerTourNext()">下一步</button></div>
+  </div>
+ </div>
+</div>
+<div id="invoiceTourOverlay" class="tour-overlay print-hide" aria-hidden="true">
+  <div id="invoiceTourSpotlight" class="tour-spotlight"></div>
+  <div id="invoiceTourCard" class="tour-card">
+    <div class="tour-progress" id="invoiceTourProgress"></div>
+    <strong id="invoiceTourTitle"></strong>
+    <p id="invoiceTourText"></p>
+    <div class="tour-actions">
+      <button type="button" class="tour-skip" onclick="endInvoiceTour()">跳過教學</button>
+      <div><button type="button" class="tour-prev" id="invoiceTourPrev" onclick="invoiceTourPrev()">上一步</button>
+      <button type="button" class="tour-next" id="invoiceTourNext" onclick="invoiceTourNext()">下一步</button></div>
+    </div>
+  </div>
+</div>
+<div id="receiveTourOverlay" class="tour-overlay print-hide" aria-hidden="true">
+  <div id="receiveTourSpotlight" class="tour-spotlight"></div>
+  <div id="receiveTourCard" class="tour-card">
+    <div class="tour-progress" id="receiveTourProgress"></div>
+    <strong id="receiveTourTitle"></strong>
+    <p id="receiveTourText"></p>
+    <div class="tour-actions">
+      <button type="button" class="tour-skip" onclick="endReceiveTour()">跳過教學</button>
+      <div>
+        <button type="button" class="tour-prev" id="receiveTourPrev" onclick="receiveTourPrev()">上一步</button>
+        <button type="button" class="tour-next" id="receiveTourNext" onclick="receiveTourNext()">下一步</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="newRecordTourOverlay" class="tour-overlay print-hide" aria-hidden="true">
+  <div id="newRecordTourSpotlight" class="tour-spotlight"></div>
+  <div id="newRecordTourCard" class="tour-card">
+    <div class="tour-progress" id="newRecordTourProgress"></div>
+    <strong id="newRecordTourTitle"></strong>
+    <p id="newRecordTourText"></p>
+    <div class="tour-actions">
+      <button type="button" class="tour-skip" onclick="endNewRecordTour()">跳過教學</button>
+      <div>
+        <button type="button" class="tour-prev" id="newRecordTourPrev" onclick="tourPrev()">上一步</button>
+        <button type="button" class="tour-next" id="newRecordTourNext" onclick="tourNext()">下一步</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="bottom-main-nav print-hide" id="bottomMainNav" aria-label="主要功能">
+  <button type="button" data-main-nav="home" onclick="bottomNavGo('home')"><span>🏠</span><b>首頁</b></button>
+  <button type="button" data-main-nav="work" onclick="bottomNavGo('work')"><span>📅</span><b>工作</b></button>
+  <button type="button" data-main-nav="money" onclick="bottomNavGo('money')"><span>💰</span><b>帳務</b></button>
+  <button type="button" data-main-nav="more" onclick="bottomNavGo('more')"><span>☰</span><b>更多</b></button>
+</nav>
+
+
+<script id="v37-8-bottom-navigation-js">
+function bottomNavMark(name){
+  document.querySelectorAll('#bottomMainNav button').forEach(function(btn){
+    btn.classList.toggle('active', btn.dataset.mainNav===name);
+  });
+}
+function bottomNavGo(name){
+  if(name==='home'){
+    bottomNavMark(name);
+    var home=document.getElementById('dashboard');
+    if(home) home.scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
+  if(name==='work'){
+    bottomNavMark(name);
+    openBottomWork();
+    return;
+  }
+  if(name==='money'){
+    bottomNavMark(name);
+    openBottomMoney();
+    return;
+  }
+  if(name==='more'){
+    bottomNavMark(name);
+    openBottomMore();
+    return;
+  }
+}
+document.addEventListener('DOMContentLoaded',function(){bottomNavMark('home');});
+</script>
+
+<script id="v37-8-2-more-sheet-js">
+function bottomMoreIsAdmin(){
+  try{return !!(eval("CURRENT_PROFILE") && eval("CURRENT_PROFILE").role==="admin");}catch(e){return false;}
+}
+function openBottomMore(){
+  var sheet=document.getElementById("bottomMoreSheet");
+  if(!sheet)return;
+  document.querySelectorAll("#bottomMoreSheet .bottom-more-admin").forEach(function(el){
+    el.style.display=bottomMoreIsAdmin()?"block":"none";
+  });
+  sheet.classList.add("open");
+  sheet.setAttribute("aria-hidden","false");
+}
+function closeBottomMore(){
+  var sheet=document.getElementById("bottomMoreSheet");
+  if(!sheet)return;
+  sheet.classList.remove("open");
+  sheet.setAttribute("aria-hidden","true");
+}
+function bottomMoreAction(action){
+  closeBottomMore();
+  if(action==="business") document.getElementById("businessSettingsBtn")?.click();
+  if(action==="vehicle" && typeof openVehicleTypes==="function") openVehicleTypes();
+  if(action==="guide" && typeof openUserGuide==="function") openUserGuide();
+  if(action==="create") document.getElementById("adminFab")?.click();
+  if(action==="users") document.getElementById("adminUsersBtn")?.click();
+  if(action==="logout") document.getElementById("logoutBtn")?.click();
+}
+document.getElementById("bottomMoreSheet")?.addEventListener("click",function(e){
+  if(e.target===this) closeBottomMore();
+});
+</script>
+<script id="v37-9-work-menu-js">
+function openBottomWork(){
+  var sheet=document.getElementById("bottomWorkSheet");
+  if(!sheet)return;
+  sheet.classList.add("open");
+  sheet.setAttribute("aria-hidden","false");
+}
+function closeBottomWork(){
+  var sheet=document.getElementById("bottomWorkSheet");
+  if(!sheet)return;
+  sheet.classList.remove("open");
+  sheet.setAttribute("aria-hidden","true");
+}
+function bottomWorkGo(id){
+  closeBottomWork();
+  showV37Page(id);
+}
+document.getElementById("bottomWorkSheet")?.addEventListener("click",function(e){
+  if(e.target===this) closeBottomWork();
+});
+</script>
+<script id="v37-10-accounting-menu-js">
+function openBottomMoney(){
+  var sheet=document.getElementById("bottomMoneySheet");
+  if(!sheet)return;
+  sheet.classList.add("open");
+  sheet.setAttribute("aria-hidden","false");
+}
+function closeBottomMoney(){
+  var sheet=document.getElementById("bottomMoneySheet");
+  if(!sheet)return;
+  sheet.classList.remove("open");
+  sheet.setAttribute("aria-hidden","true");
+}
+function bottomMoneyGo(id){
+  closeBottomMoney();
+  showV37Page(id);
+}
+document.getElementById("bottomMoneySheet")?.addEventListener("click",function(e){
+  if(e.target===this) closeBottomMoney();
+});
+</script>
+<script id="v37-11-home-cleanup-js">
+function updateHomeUnreceived(){
+  var el=document.getElementById("dashUnreceived");
+  if(!el)return;
+  try{
+    var rows=(window.state&&Array.isArray(window.state.records))?window.state.records:
+             ((typeof state!=="undefined"&&Array.isArray(state.records))?state.records:[]);
+    var total=rows.filter(function(r){return !r.received;}).reduce(function(sum,r){
+      return sum+Number(r.amountInc ?? r.amount ?? 0);
+    },0);
+    el.textContent="$"+Math.round(total).toLocaleString("zh-TW");
+  }catch(e){el.textContent="$0";}
+}
+document.addEventListener("DOMContentLoaded",function(){
+  updateHomeUnreceived();
+  var root=document.querySelector("main");
+  if(root){
+    var timer=null;
+    new MutationObserver(function(){
+      clearTimeout(timer); timer=setTimeout(updateHomeUnreceived,60);
+    }).observe(root,{subtree:true,childList:true,characterData:true});
+  }
+});
+</script>
+<script id="v37-12-real-pages-js">
+(function(){
+  var pageIds=["dashboard","todayPanel","newRecord","monthlyWork","expenses","finance","invoiceCenter","collectionLedger","customerMaster","customers","recordsSection"];
+
+  function hideV37Pages(){
+    pageIds.forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.classList.remove("v37-page-visible");
+    });
+  }
+
+  window.showV37Page=function(id){
+    hideV37Pages();
+    var el=document.getElementById(id);
+    if(el){
+      el.classList.add("v37-page-visible");
+      window.scrollTo({top:0,behavior:"smooth"});
+    }
+  };
+
+  window.showV37Home=function(){
+    hideV37Pages();
+    ["dashboard","todayPanel","newRecord"].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.classList.add("v37-page-visible");
+    });
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+
+  // Override the bottom navigation after the older navigation code has loaded.
+  window.bottomNavGo=function(name){
+    if(typeof bottomNavMark==="function") bottomNavMark(name);
+    if(name==="home"){ showV37Home(); return; }
+    if(name==="work"){ if(typeof openBottomWork==="function") openBottomWork(); return; }
+    if(name==="money"){ if(typeof openBottomMoney==="function") openBottomMoney(); return; }
+    if(name==="more"){ if(typeof openBottomMore==="function") openBottomMore(); return; }
+  };
+
+  function initV37Pages(){
+    document.body.classList.add("v37-pages-ready");
+    showV37Home();
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",initV37Pages);
+  else initV37Pages();
+})();
+</script>
+<script id="v37-13-home-expense-js">
+(function(){
+  window.showV37Home=function(){
+    var ids=["dashboard","homeRemindersV33","todayPanel","newRecord","monthlyWork","expenses","finance","invoiceCenter","collectionLedger","customerMaster","customers","recordsSection"];
+    ids.forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.classList.remove("v37-page-visible");
+    });
+    ["dashboard","homeRemindersV33","todayPanel","newRecord","expenses"].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el) el.classList.add("v37-page-visible");
+    });
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+  // Re-apply homepage after prior page initializer has run.
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",function(){setTimeout(showV37Home,0);});
+  }else{
+    setTimeout(showV37Home,0);
+  }
+})();
+</script>
+<script id="v37-14-admin-modal-bridge">
+(function(){
+  var modal=document.getElementById("adminModal");
+  if(!modal)return;
+  function sync(){
+    if(modal.style.display && modal.style.display!=="none") modal.classList.add("open");
+  }
+  new MutationObserver(sync).observe(modal,{attributes:true,attributeFilter:["style"]});
+  var close=document.getElementById("adminClose");
+  if(close) close.addEventListener("click",function(){modal.classList.remove("open");});
+})();
+</script>
+<script id="v37-15-work-direct-js">
+(function(){
+  window.bottomNavGo=function(name){
+    if(typeof bottomNavMark==="function") bottomNavMark(name);
+    if(name==="home"){ showV37Home(); return; }
+    if(name==="work"){ showV37Page("monthlyWork"); return; }
+    if(name==="money"){ if(typeof openBottomMoney==="function") openBottomMoney(); return; }
+    if(name==="more"){ if(typeof openBottomMore==="function") openBottomMore(); return; }
+  };
+})();
+</script>
+<script id="v37-17-cards-home-only-js">
+(function(){
+  var oldShowPage=window.showV37Page;
+  var oldShowHome=window.showV37Home;
+
+  window.showV37Page=function(id){
+    document.body.classList.add("v37-non-home");
+    if(typeof oldShowPage==="function") oldShowPage(id);
+  };
+
+  window.showV37Home=function(){
+    document.body.classList.remove("v37-non-home");
+    if(typeof oldShowHome==="function") oldShowHome();
+  };
+
+  window.bottomNavGo=function(name){
+    if(typeof bottomNavMark==="function") bottomNavMark(name);
+    if(name==="home"){ showV37Home(); return; }
+    if(name==="work"){ showV37Page("monthlyWork"); return; }
+    if(name==="money"){
+      document.body.classList.add("v37-non-home");
+      if(typeof openBottomMoney==="function") openBottomMoney();
+      return;
+    }
+    if(name==="more"){ if(typeof openBottomMore==="function") openBottomMore(); return; }
+  };
+})();
+</script>
+<script id="v37-23-invoice-center-edit-fix-js">
+(function(){
+ function ex(r){return Number(r.amountEx ?? ((Number(r.amountInc??r.amount)||0)/1.05))||0}
+ function inc(r){return Number(r.amountInc??r.amount??0)||0}
+ window.renderInvoiceCenter=function(){
+  var box=document.getElementById("invoiceCenterList"); if(!box)return;
+  var rows=(typeof state!=="undefined"&&Array.isArray(state.records)?state.records:[]).filter(function(r){return r.invoice_status==="開發票"}).sort(function(a,b){return String(b.date||"").localeCompare(String(a.date||""))});
+  document.getElementById("invoiceCenterEx").textContent=money(rows.reduce(function(a,r){return a+ex(r)},0));
+  document.getElementById("invoiceCenterInc").textContent=money(rows.reduce(function(a,r){return a+inc(r)},0));
+  if(!rows.length){box.innerHTML='<div class="invoice-empty">目前沒有待開發票的紀錄</div>';return}
+  var g={}; rows.forEach(function(r){(g[r.customer]||(g[r.customer]=[])).push(r)});
+  box.innerHTML=Object.keys(g).sort(function(a,b){return a.localeCompare(b,"zh-Hant")}).map(function(name){
+   var rs=g[name],sum=rs.reduce(function(a,r){return a+inc(r)},0);
+   return '<div class="invoice-company"><div class="invoice-company-head"><div><strong>'+esc(name)+'</strong><div class="muted">統編：'+esc(rs[0].tax||"—")+'</div></div><div class="invoice-company-sum">含稅 '+money(sum)+'</div></div>'+rs.map(function(r){return '<div class="invoice-row"><div>'+esc(r.date||"")+'</div><div><span class="invoice-badge">要開發票</span> '+esc(r.work||"")+'</div><div class="invoice-row-money"><b>'+money(inc(r))+'</b><div class="muted">未稅 '+money(ex(r))+'</div></div></div>'}).join("")+'</div>'
+  }).join("")
+ };
+ var oldRenderAll=window.renderAll;
+ window.renderAll=function(){oldRenderAll();renderInvoiceCenter()};
+ var oldEdit=window.editRecord;
+ window.editRecord=function(i){
+  oldEdit(i);
+  if(typeof showV37Page==="function")showV37Page("newRecord");
+  setTimeout(function(){var el=document.getElementById("newRecord");if(el)el.scrollIntoView({behavior:"smooth",block:"start"})},50);
+ };
+ document.addEventListener("DOMContentLoaded",renderInvoiceCenter);
+})();
+</script>
+<script id="v37-26-invoice-completed-js">
+var INVOICE_CENTER_MODE="pending";
+function setInvoiceCenterMode(mode){
+  INVOICE_CENTER_MODE=mode==="done"?"done":"pending";
+  document.getElementById("invoicePendingTab")?.classList.toggle("active",INVOICE_CENTER_MODE==="pending");
+  document.getElementById("invoiceDoneTab")?.classList.toggle("active",INVOICE_CENTER_MODE==="done");
+  renderInvoiceCenterV26();
+}
+async function markInvoiceCompleted(recordId){
+  try{
+    await apiFetch("/records?id=eq."+encodeURIComponent(recordId),{
+      method:"PATCH",
+      headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify({invoice_completed:true,invoice_completed_date:localISODate()})
+    });
+    var r=state.records.find(function(x){return String(x.id)===String(recordId)});
+    if(r){r.invoice_completed=true;r.invoice_completed_date=localISODate();}
+    renderAll();
+    renderInvoiceCenterV26();
+  }catch(e){alert("更新失敗："+e.message)}
+}
+async function cancelInvoiceCompleted(recordId){
+  if(!confirm("確定要取消『已開發票』嗎？\n取消後會回到待開發票。"))return;
+  try{
+    await apiFetch("/records?id=eq."+encodeURIComponent(recordId),{
+      method:"PATCH",
+      headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
+      body:JSON.stringify({invoice_completed:false,invoice_completed_date:null})
+    });
+    var r=state.records.find(function(x){return String(x.id)===String(recordId)});
+    if(r){r.invoice_completed=false;r.invoice_completed_date=null;}
+    renderAll();
+    renderInvoiceCenterV26();
+  }catch(e){alert("取消失敗："+e.message)}
+}
+function renderInvoiceCenterV26(){
+  var box=document.getElementById("invoiceCenterList"); if(!box)return;
+  var all=(state.records||[]).filter(function(r){return r.invoice_status==="開發票"});
+  var pending=all.filter(function(r){return !r.invoice_completed});
+  var done=all.filter(function(r){return !!r.invoice_completed});
+  document.getElementById("invoicePendingCount").textContent=pending.length;
+  document.getElementById("invoiceDoneCount").textContent=done.length;
+  var rows=(INVOICE_CENTER_MODE==="done"?done:pending).slice().sort(function(a,b){return String(b.date||"").localeCompare(String(a.date||""))});
+  function ex(r){return Number(r.amountEx ?? ((Number(r.amountInc??r.amount)||0)/1.05))||0}
+  function inc(r){return Number(r.amountInc??r.amount??0)||0}
+  document.getElementById("invoiceCenterEx").textContent=money(rows.reduce(function(a,r){return a+ex(r)},0));
+  document.getElementById("invoiceCenterInc").textContent=money(rows.reduce(function(a,r){return a+inc(r)},0));
+  if(!rows.length){box.innerHTML='<div class="invoice-empty">'+(INVOICE_CENTER_MODE==="done"?"目前沒有已開發票的紀錄":"目前沒有待開發票的紀錄")+'</div>';return}
+  var g={};rows.forEach(function(r){(g[r.customer]||(g[r.customer]=[])).push(r)});
+  box.innerHTML=Object.keys(g).sort(function(a,b){return a.localeCompare(b,"zh-Hant")}).map(function(name){
+    var rs=g[name],sum=rs.reduce(function(a,r){return a+inc(r)},0);
+    return '<div class="invoice-company"><div class="invoice-company-head"><div><strong>'+esc(name)+'</strong><div class="muted">統編：'+esc(rs[0].tax||"—")+'</div></div><div class="invoice-company-sum">含稅 '+money(sum)+'</div></div>'+
+    rs.map(function(r){
+      var completedDate=r.invoice_completed_date?displayReceivedDate(r.invoice_completed_date):"";
+      var status=INVOICE_CENTER_MODE==="done"?'<span class="invoice-done-badge">✓ 已開發票</span>'+(completedDate?'<span class="invoice-completed-date">開票日期 '+esc(completedDate)+'</span>':'<span class="invoice-completed-date muted">開票日期未記錄</span>'):'<span class="invoice-badge">要開發票</span>';
+      var action=INVOICE_CENTER_MODE==="pending"?'<div class="invoice-row-action"><button class="invoice-complete-btn" type="button" onclick="markInvoiceCompleted(\''+String(r.id).replace(/'/g,"\\'")+'\')">✓ 已開發票</button></div>':'<div class="invoice-row-action"><button class="invoice-cancel-btn" type="button" onclick="cancelInvoiceCompleted(\''+String(r.id).replace(/'/g,"\\'")+'\')">↩ 取消已開發票</button></div>';
+      return '<div class="invoice-row"><div>'+esc(r.date||"")+'</div><div>'+status+' '+esc(r.work||"")+action+'</div><div class="invoice-row-money"><b>'+money(inc(r))+'</b><div class="muted">未稅 '+money(ex(r))+'</div></div></div>'
+    }).join("")+'</div>'
+  }).join("");
+}
+(function(){
+ var prev=window.renderInvoiceCenter;
+ window.renderInvoiceCenter=renderInvoiceCenterV26;
+ document.addEventListener("DOMContentLoaded",function(){setTimeout(renderInvoiceCenterV26,300)});
+})();
+</script>
+
+<script id="v37-27-collection-layout-normalizer">
+(function(){
+  function normalizeCollectionDetail(){
+    var sections=[].slice.call(document.querySelectorAll("section, .card, .panel"));
+    sections.forEach(function(sec){
+      var txt=(sec.innerText||"");
+      if(txt.indexOf("收款帳本")<0 || txt.indexOf("返回公司")<0) return;
+      sec.classList.add("collection-company-detail");
+      var buttons=[].slice.call(sec.querySelectorAll("button"));
+      buttons.forEach(function(b){
+        var t=(b.innerText||"").trim();
+        if(t.indexOf("返回公司")>=0) b.classList.add("collection-back-btn");
+      });
+      var tables=sec.querySelectorAll("table");
+      tables.forEach(function(t){t.classList.add("collection-detail-table")});
+      var groups=[].slice.call(sec.querySelectorAll("div"));
+      groups.forEach(function(g){
+        var direct=[].slice.call(g.children);
+        if(direct.length===4){
+          var ts=direct.map(function(x){return (x.innerText||"").trim()});
+          if(ts.some(function(x){return x==="全部"}) &&
+             ts.some(function(x){return x==="匯款"}) &&
+             ts.some(function(x){return x==="現金"}) &&
+             ts.some(function(x){return x==="簽帳"})) g.classList.add("collection-detail-tabs");
+        }
+      });
+    });
+  }
+  document.addEventListener("DOMContentLoaded",function(){
+    normalizeCollectionDetail();
+    var mo=new MutationObserver(function(){normalizeCollectionDetail()});
+    mo.observe(document.body,{subtree:true,childList:true});
+  });
+})();
+</script>
+
+<script id="v37-33-home-reminders-js">
+function renderHomeRemindersV33(){
+  var rs=state.records||[];
+  var unpaid=rs.filter(function(r){return !r.received});
+  var invoices=rs.filter(function(r){return r.invoice_status==="開發票"&&!r.invoice_completed});
+  function amount(r){return Number(r.amountInc??r.amount??0)||0}
+  var a=document.getElementById("homeUnpaidCountV33"),b=document.getElementById("homeUnpaidAmountV33");
+  var c=document.getElementById("homeInvoiceCountV33"),d=document.getElementById("homeInvoiceAmountV33");
+  if(a)a.textContent=unpaid.length+" 筆";
+  if(b)b.textContent=money(Math.round(unpaid.reduce(function(x,r){return x+amount(r)},0)));
+  if(c)c.textContent=invoices.length+" 筆";
+  if(d)d.textContent=money(Math.round(invoices.reduce(function(x,r){return x+amount(r)},0)));
+}
+function openUnpaidV33(){
+  if(typeof showV37Page==="function")showV37Page("collectionLedger");
+  collectionCompany="";collectionCompanyFilter="未收款";collectionKind="全部";
+  renderCollectionLedger();
+}
+function openInvoiceV33(){
+  if(typeof showV37Page==="function")showV37Page("invoiceCenter");
+  if(typeof setInvoiceCenterMode==="function")setInvoiceCenterMode("pending");
+}
+document.addEventListener("DOMContentLoaded",function(){setTimeout(renderHomeRemindersV33,400)});
+</script>
+
+
+<style id="v37-52-user-guide-style">
+.user-guide-backdrop{display:none;position:fixed;inset:0;z-index:10080;background:#f5f7fa;box-sizing:border-box}
+.user-guide-backdrop.open{display:block}
+.user-guide-sheet{height:100dvh;width:100%;background:#f5f7fa;display:flex;flex-direction:column;overflow:hidden}
+.user-guide-head{flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;background:#fff;border-bottom:1px solid #e4e9ee}
+.user-guide-head strong{display:block;font-size:22px}
+.user-guide-head small{display:block;color:#667085;margin-top:3px}
+.user-guide-head button{min-height:42px;padding:8px 14px;border-radius:11px}
+.user-guide-content{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px calc(30px + env(safe-area-inset-bottom))}
+.user-guide-home{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:680px;margin:0 auto}
+.user-guide-home button{min-height:132px;background:#fff;border:1px solid #e1e7ee;border-radius:18px;padding:17px 12px;text-align:left;box-shadow:0 3px 12px rgba(15,23,42,.04)}
+.user-guide-home span{display:block;font-size:30px;margin-bottom:8px}
+.user-guide-home b{display:block;font-size:18px;color:#16243a}
+.user-guide-home small{display:block;font-size:14px;color:#667085;margin-top:5px;line-height:1.4}
+.user-guide-topic{max-width:680px;margin:0 auto}
+.user-guide-back-btn{width:100%;min-height:48px;margin-bottom:14px;border-radius:13px;background:#fff;border:1px solid #dbe3eb;font-weight:800;text-align:left;padding:0 15px}
+.guide-step{position:relative;background:#fff;border:1px solid #e1e7ee;border-radius:17px;padding:16px 16px 16px 62px;margin-bottom:13px;min-height:58px}
+.guide-step-num{position:absolute;left:15px;top:15px;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#edf3f8;font-weight:900;font-size:17px}
+.guide-step b{display:block;font-size:18px;color:#17243a;margin-bottom:4px}
+.guide-step p{margin:0;color:#475467;line-height:1.55;font-size:16px}
+.guide-done{text-align:center;background:#fff;border:1px solid #dfe6ec;border-radius:17px;padding:18px;font-size:18px;font-weight:900;margin-top:16px}
+body.user-guide-open #bottomMainNav{display:none!important}
+@media(max-width:430px){
+  .user-guide-home{grid-template-columns:1fr 1fr;gap:10px}
+  .user-guide-home button{min-height:125px;padding:15px 11px}
+  .user-guide-home b{font-size:17px}
+}
+</style>
+<script id="v37-52-user-guide-js">
+(function(){
+  const guides={
+    start:{title:"🚀 第一次使用",steps:[
+      ["建立客戶","到「帳務 → 客戶資料庫」，先新增客戶資料。"],
+      ["新增請款","回首頁按「新增請款」，或在客戶資料庫按「帶入請款」。"],
+      ["填寫工作","輸入日期、工作內容、地點、車種、時間與金額。"],
+      ["儲存","確認付款方式與發票設定後按儲存。"]
+    ]},
+    billing:{title:"🧾 新增請款",steps:[
+      ["按新增請款","在首頁找到「新增請款」。"],
+      ["選擇客戶","可直接輸入，也可以先從客戶資料庫按「帶入請款」。"],
+      ["填工作資料","填日期、內容、工作地點、車種、時間與金額。"],
+      ["完成儲存","選付款方式、發票設定後儲存。"]
+    ]},
+    receive:{title:"💰 收到款項",steps:[
+      ["進入帳務","下方按「帳務」。"],
+      ["打開收款帳本","找到要收款的那一筆。"],
+      ["改成已收款","按「未收款」切換成「已收款」。"],
+      ["完成","系統會自動記錄收款日期。"]
+    ]},
+    invoice:{title:"📄 開發票",steps:[
+      ["進入發票管理","到「帳務 → 發票管理」。"],
+      ["找到待開發票","選擇已經完成開票的紀錄。"],
+      ["按已開發票","系統會記錄完成日期。"],
+      ["如果按錯","可按「取消已開發票」恢復。"]
+    ]},
+    customer:{title:"👥 客戶資料庫",steps:[
+      ["進入客戶資料庫","到「帳務 → 客戶資料庫」。"],
+      ["新增客戶","輸入公司名稱、統編及需要的聯絡資料。"],
+      ["避免重複","公司名稱或統編已存在時，系統會提醒。"],
+      ["快速使用","按「帶入請款」可直接建立這位客戶的新請款；「查看詳情」可看歷史工作。"]
+    ]},
+    other:{title:"⚙️ 其他功能",steps:[
+      ["每月工作","下方按「工作」，查看每月工作紀錄。"],
+      ["支出","首頁可以直接新增支出。"],
+      ["本月收支","到「帳務 → 本月收支」，查看收入、稅金、付款方式、支出與結餘。"],
+      ["設定","到「更多」管理工程行名稱、車種與帳號相關功能。"]
+    ]}
+  };
+
+  window.openUserGuide=function(){
+    const modal=document.getElementById("userGuideModal");
+    if(!modal)return;
+    showGuideHome();
+    document.body.classList.add("user-guide-open");
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden","false");
+  };
+
+  window.closeUserGuide=function(){
+    const modal=document.getElementById("userGuideModal");
+    if(!modal)return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden","true");
+    document.body.classList.remove("user-guide-open");
+  };
+
+  window.showGuideHome=function(){
+    const home=document.getElementById("userGuideHome");
+    const topic=document.getElementById("userGuideTopic");
+    const title=document.getElementById("userGuideTitle");
+    const sub=document.getElementById("userGuideSubtitle");
+    if(home) home.hidden=false;
+    if(topic){topic.hidden=true;topic.innerHTML="";}
+    if(title) title.textContent="📖 使用說明";
+    if(sub) sub.textContent="想做什麼？點一下就會教你";
+    const content=document.querySelector("#userGuideModal .user-guide-content");
+    if(content) content.scrollTop=0;
+  };
+
+  window.showGuideTopic=function(key){
+    const g=guides[key]; if(!g)return;
+    const home=document.getElementById("userGuideHome");
+    const topic=document.getElementById("userGuideTopic");
+    const title=document.getElementById("userGuideTitle");
+    const sub=document.getElementById("userGuideSubtitle");
+    if(home) home.hidden=true;
+    if(title) title.textContent=g.title;
+    if(sub) sub.textContent="照著下面步驟操作";
+    topic.innerHTML='<button type="button" class="user-guide-back-btn" onclick="showGuideHome()">← 回到使用說明</button>'+
+      g.steps.map((s,i)=>'<div class="guide-step"><span class="guide-step-num">'+(i+1)+'</span><b>'+s[0]+'</b><p>'+s[1]+'</p></div>').join("")+
+      '<div class="guide-done">完成 ✓</div>';
+    topic.hidden=false;
+    const content=document.querySelector("#userGuideModal .user-guide-content");
+    if(content) content.scrollTop=0;
+  };
+})();
+</script>
+
+
+
+<style id="v37-53-new-record-tour-style">
+.tour-overlay{display:none;position:fixed;inset:0;z-index:12000;pointer-events:none}
+.tour-overlay.open{display:block}
+.tour-spotlight{position:fixed;border:3px solid #fff;border-radius:16px;box-shadow:0 0 0 9999px rgba(10,20,35,.66),0 5px 20px rgba(0,0,0,.18);transition:left .12s ease,top .12s ease,width .12s ease,height .12s ease;pointer-events:none}
+.tour-card{position:fixed;left:14px;right:14px;z-index:12002;background:#fff;border-radius:18px;padding:16px;box-shadow:0 18px 50px rgba(0,0,0,.28);pointer-events:auto;max-width:520px;margin:auto}
+.tour-card strong{display:block;font-size:19px;color:#14243a;margin:5px 0 6px}
+.tour-card p{margin:0;color:#475467;font-size:15px;line-height:1.55}
+.tour-progress{font-size:12px;font-weight:900;color:#667085}
+.tour-actions{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:14px}
+.tour-actions>div{display:flex;gap:8px}
+.tour-actions button{min-height:42px;border-radius:11px;padding:8px 13px;font-weight:900}
+.tour-next{background:#2169df!important;color:#fff!important;border-color:#2169df!important}
+.tour-skip{background:transparent!important;border:0!important;color:#667085!important;padding-left:0!important}
+.tour-prev[disabled]{display:none}
+body.new-record-tour-open #bottomMainNav{display:none!important}
+@media(min-width:700px){.tour-card{left:50%;right:auto;transform:translateX(-50%);width:480px}}
+</style>
+<script id="v37-53-new-record-tour-js">
+(function(){
+  const steps=[
+    {sel:".company-lookup-wrap",title:"客戶名稱",text:"先輸入客戶名稱。已建立過的客戶也可以直接選擇。"},
+    {sel:"#date",title:"工作日期",text:"選擇這次吊車工作的日期。"},
+    {sel:"#truck",title:"車種",text:"選擇這次出車使用的車種。"},
+    {sel:".location-row",title:"工作地點",text:"填寫實際施工地點，也可以使用目前定位或 Google 地圖。"},
+    {sel:"#work",title:"工作內容",text:"簡單寫這次做什麼，例如吊裝鋼構、吊料。"},
+    {sel:"#durationButtons",title:"工作時間",text:"選擇半天、一天或加班。需要時再填加班時數。"},
+    {sel:"#amountEx",title:"請款金額",text:"輸入未稅金額，稅額與含稅金額會自動計算。"},
+    {sel:"#invoiceButtons",title:"發票",text:"選擇這筆請款要開發票或不開發票。"},
+    {sel:"#paymentButtons",title:"收款方式",text:"選擇匯款、簽帳或現金。"},
+    {sel:"#newRecord>.actions",title:"完成新增",text:"資料確認後，按「新增請款紀錄」就完成了。"}
+  ];
+  let index=0;
+
+  function elForStep(){return document.querySelector(steps[index].sel);}
+  function position(){
+    const el=elForStep(), spot=document.getElementById("newRecordTourSpotlight"), card=document.getElementById("newRecordTourCard");
+    if(!el||!spot||!card)return;
+    const r=el.getBoundingClientRect(), pad=7;
+    spot.style.left=Math.max(6,r.left-pad)+"px";
+    spot.style.top=Math.max(6,r.top-pad)+"px";
+    spot.style.width=Math.min(innerWidth-12,r.width+pad*2)+"px";
+    spot.style.height=(r.height+pad*2)+"px";
+    const cardH=card.offsetHeight||190;
+    const below=r.bottom+18;
+    if(below+cardH<innerHeight-10) card.style.top=below+"px";
+    else card.style.top=Math.max(10,r.top-cardH-18)+"px";
+  }
+  let tourRaf=0;
+  function render(){
+    const s=steps[index], el=elForStep();
+    if(!el){ if(index<steps.length-1){index++;render();} return; }
+
+    document.getElementById("newRecordTourProgress").textContent="步驟 "+(index+1)+" / "+steps.length;
+    document.getElementById("newRecordTourTitle").textContent=s.title;
+    document.getElementById("newRecordTourText").textContent=s.text;
+    const prev=document.getElementById("newRecordTourPrev");
+    prev.disabled=index===0;
+    document.getElementById("newRecordTourNext").textContent=index===steps.length-1?"完成":"下一步";
+
+    // 先立即更新提示框；只有目標真的離開可視範圍才捲動。
+    cancelAnimationFrame(tourRaf);
+    tourRaf=requestAnimationFrame(position);
+
+    const r=el.getBoundingClientRect();
+    const safeTop=90;
+    const safeBottom=innerHeight-230;
+    const needsScroll=r.top<safeTop || r.bottom>safeBottom;
+
+    if(needsScroll){
+      el.scrollIntoView({behavior:"auto",block:"center"});
+      tourRaf=requestAnimationFrame(function(){
+        tourRaf=requestAnimationFrame(position);
+      });
+    }
+  }
+
+  window.startNewRecordTour=function(){
+    closeUserGuide();
+    if(typeof showV37Page==="function") showV37Page("newRecord");
+    index=0;
+    document.body.classList.add("new-record-tour-open");
+    const overlay=document.getElementById("newRecordTourOverlay");
+    overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden","false");
+    requestAnimationFrame(function(){
+      requestAnimationFrame(render);
+    });
+  };
+  window.tourNext=function(){
+    if(index>=steps.length-1){endNewRecordTour();return;}
+    index++; render();
+  };
+  window.tourPrev=function(){if(index>0){index--;render();}};
+  window.endNewRecordTour=function(){
+    const overlay=document.getElementById("newRecordTourOverlay");
+    if(overlay){overlay.classList.remove("open");overlay.setAttribute("aria-hidden","true");}
+    document.body.classList.remove("new-record-tour-open");
+  };
+  window.addEventListener("resize",function(){
+    if(document.getElementById("newRecordTourOverlay")?.classList.contains("open")) position();
+  });
+})();
+</script>
+
+
+<script id="v37-58-receive-tour-js">
+(function(){
+  let idx=0, raf=0, unpaidCompany="", receivedCompany="";
+  const steps=[
+    ["收款帳本","這裡可以查看所有客戶的收款狀況。"],
+    ["選擇未收款客戶","這張卡片有未收款金額。平常點客戶卡片，就能進入工作明細。"],
+    ["找到要收款的工作","現在已經進入這位客戶。框起來的這一列就是一筆未收款工作。"],
+    ["按「未收款」","客戶付款後，就按框起來的「未收款」按鈕。教學不會替你按。"],
+    ["收款日期","完成收款後，系統會在「已收款」下方自動顯示收款日期。"]
+  ];
+
+  function records(){ return (state.records||[]); }
+  function unpaidRecord(){ return records().find(r=>!r.received); }
+  function receivedWithDate(){ return records().find(r=>r.received && r.received_date); }
+
+  function prepare(){
+    const u=unpaidRecord(), d=receivedWithDate();
+    if(u) unpaidCompany=String(u.customer||"未命名客戶").trim()||"未命名客戶";
+    if(d) receivedCompany=String(d.customer||"未命名客戶").trim()||"未命名客戶";
+
+    if(idx<=1){
+      if(typeof closeCollectionCompany==="function") closeCollectionCompany();
+      if(idx===1 && typeof setCollectionCompanyFilter==="function") setCollectionCompanyFilter("未收款");
+      return;
+    }
+
+    if(idx===2 || idx===3){
+      if(unpaidCompany && typeof openCollectionCompany==="function") openCollectionCompany(unpaidCompany);
+      // 收款帳本的分類是付款方式（全部/匯款/現金/簽帳），不是收款狀態。
+      if(typeof setCollectionKind==="function") setCollectionKind("全部");
+      return;
+    }
+
+    if(idx===4){
+      if(receivedCompany && typeof openCollectionCompany==="function"){
+        openCollectionCompany(receivedCompany);
+        if(typeof setCollectionKind==="function") setCollectionKind("全部");
+      }
+    }
+  }
+
+  function target(){
+    if(idx===0) return document.querySelector("#collectionLedger .collection-summary")||document.getElementById("collectionLedger");
+    if(idx===1){
+      const cards=[...document.querySelectorAll("#collectionCompanyList .collection-company-card")];
+      return cards.find(c=>c.textContent.includes(unpaidCompany))||cards.find(c=>/未收款/.test(c.textContent))||cards[0];
+    }
+    if(idx===2){
+      const btn=document.querySelector("#collectionRecordList .received-toggle.is-unreceived");
+      return btn ? btn.closest(".collection-record-row") : document.querySelector("#collectionRecordList .collection-record-row");
+    }
+    if(idx===3) return document.querySelector("#collectionRecordList .received-toggle.is-unreceived");
+    if(idx===4) return document.querySelector("#collectionRecordList .received-date");
+    return null;
+  }
+
+  function position(){
+    const spot=document.getElementById("receiveTourSpotlight"), card=document.getElementById("receiveTourCard");
+    if(!spot||!card)return;
+    const el=target();
+
+    if(!el){
+      spot.style.display="none";
+      card.style.left="18px"; card.style.right="18px";
+      card.style.top=Math.max(110,(innerHeight-card.offsetHeight)/2)+"px";
+      return;
+    }
+    spot.style.display="block";
+    const r=el.getBoundingClientRect(), pad=8;
+    const l=Math.max(7,r.left-pad), t=Math.max(7,r.top-pad);
+    spot.style.left=l+"px"; spot.style.top=t+"px";
+    spot.style.width=Math.max(44,Math.min(innerWidth-l-7,r.width+pad*2))+"px";
+    spot.style.height=Math.max(44,Math.min(innerHeight-t-7,r.height+pad*2))+"px";
+
+    const ch=card.offsetHeight||190, gap=14;
+    if(r.bottom+gap+ch<=innerHeight-12) card.style.top=(r.bottom+gap)+"px";
+    else if(r.top-ch-gap>=12) card.style.top=(r.top-ch-gap)+"px";
+    else card.style.top=Math.max(12,innerHeight-ch-18)+"px";
+  }
+
+  function render(){
+    prepare();
+    requestAnimationFrame(()=>{
+      const s=steps[idx], dateRecord=receivedWithDate();
+      document.getElementById("receiveTourProgress").textContent="步驟 "+(idx+1)+" / "+steps.length;
+      document.getElementById("receiveTourTitle").textContent=s[0];
+      document.getElementById("receiveTourText").textContent=
+        idx===4 && !dateRecord
+          ? "目前帳本沒有可示範的「已收款＋收款日期」紀錄。之後把一筆款項改成已收款，日期就會顯示在「已收款」按鈕下方。"
+          : s[1];
+      document.getElementById("receiveTourPrev").disabled=idx===0;
+      document.getElementById("receiveTourNext").textContent=idx===4?"完成":"下一步";
+
+      const el=target();
+      if(el){
+        const r=el.getBoundingClientRect(), ch=document.getElementById("receiveTourCard")?.offsetHeight||190;
+        if(r.top<90 || r.bottom>innerHeight-ch-30) el.scrollIntoView({behavior:"auto",block:"center"});
+      }
+      cancelAnimationFrame(raf);
+      raf=requestAnimationFrame(()=>raf=requestAnimationFrame(position));
+    });
+  }
+
+  window.startReceiveTour=function(){
+    closeUserGuide();
+    if(typeof showV37Page==="function") showV37Page("collectionLedger");
+    idx=0;
+    document.body.classList.add("new-record-tour-open");
+    const o=document.getElementById("receiveTourOverlay");
+    o.classList.add("open"); o.setAttribute("aria-hidden","false");
+    requestAnimationFrame(()=>requestAnimationFrame(render));
+  };
+  window.receiveTourNext=function(){ if(idx>=4){endReceiveTour();return;} idx++;render(); };
+  window.receiveTourPrev=function(){ if(idx>0){idx--;render();} };
+  window.endReceiveTour=function(){
+    const o=document.getElementById("receiveTourOverlay");
+    if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}
+    document.body.classList.remove("new-record-tour-open");
+    const spot=document.getElementById("receiveTourSpotlight"); if(spot) spot.style.display="";
+  };
+  window.addEventListener("resize",()=>{if(document.getElementById("receiveTourOverlay")?.classList.contains("open"))position();});
+})();
+</script>
+
+<script id="v37-59-invoice-tour-js">
+(function(){
+ let idx=0,raf=0;
+ const steps=[
+  ["發票管理","這裡會集中顯示需要開發票的請款紀錄。"],
+  ["待開發票","先看「待開發票」，這裡是還沒完成開票的紀錄。"],
+  ["找到要開的發票","框起來的是一筆待開發票工作，可以確認客戶、工作內容與金額。"],
+  ["按「已開發票」","實際完成開票後，按這個按鈕。教學不會替你按。"],
+  ["已開發票","完成的紀錄會移到「已開發票」頁籤。"],
+  ["取消已開發票","如果不小心按錯，可以按「取消已開發票」恢復。教學不會替你按。"]
+ ];
+ function prep(){
+  if(typeof setInvoiceCenterMode==="function"){
+   if(idx<=3) setInvoiceCenterMode("pending");
+   else setInvoiceCenterMode("done");
+  }
+ }
+ function target(){
+  if(idx===0)return document.querySelector("#invoiceCenter .section-head")||document.getElementById("invoiceCenter");
+  if(idx===1)return document.getElementById("invoicePendingTab");
+  if(idx===2)return document.querySelector("#invoiceCenterList .invoice-row");
+  if(idx===3)return document.querySelector("#invoiceCenterList .invoice-complete-btn, #invoiceCenterList button[onclick*='markInvoiceCompleted']");
+  if(idx===4)return document.getElementById("invoiceDoneTab");
+  if(idx===5)return document.querySelector("#invoiceCenterList .invoice-cancel-btn, #invoiceCenterList button[onclick*='cancelInvoiceCompleted']");
+  return null;
+ }
+ function pos(){
+  const spot=document.getElementById("invoiceTourSpotlight"),card=document.getElementById("invoiceTourCard"),el=target();
+  if(!spot||!card)return;
+  if(!el){spot.style.display="none";card.style.top=Math.max(110,(innerHeight-card.offsetHeight)/2)+"px";return;}
+  spot.style.display="block";const r=el.getBoundingClientRect(),p=8,l=Math.max(7,r.left-p),t=Math.max(7,r.top-p);
+  spot.style.left=l+"px";spot.style.top=t+"px";spot.style.width=Math.max(44,Math.min(innerWidth-l-7,r.width+p*2))+"px";spot.style.height=Math.max(44,Math.min(innerHeight-t-7,r.height+p*2))+"px";
+  const ch=card.offsetHeight||190,g=14;
+  card.style.top=(r.bottom+g+ch<=innerHeight-12)?(r.bottom+g)+"px":(r.top-ch-g>=12?(r.top-ch-g)+"px":Math.max(12,innerHeight-ch-18)+"px");
+ }
+ function render(){
+  prep();requestAnimationFrame(()=>{
+   const s=steps[idx],el=target();
+   document.getElementById("invoiceTourProgress").textContent="步驟 "+(idx+1)+" / "+steps.length;
+   document.getElementById("invoiceTourTitle").textContent=s[0];
+   let txt=s[1];
+   if(!el&&idx===2)txt="目前沒有待開發票紀錄，所以沒有可示範的工作。之後有待開發票時，會顯示在這裡。";
+   if(!el&&idx===3)txt="目前沒有可示範的「已開發票」按鈕。之後有待開發票紀錄時，按鈕會顯示在該筆工作內。";
+   if(!el&&idx===5)txt="目前沒有已開發票紀錄可示範。完成開票後，可在「已開發票」頁籤看到「取消已開發票」。";
+   document.getElementById("invoiceTourText").textContent=txt;
+   document.getElementById("invoiceTourPrev").disabled=idx===0;
+   document.getElementById("invoiceTourNext").textContent=idx===steps.length-1?"完成":"下一步";
+   if(el){const r=el.getBoundingClientRect(),ch=document.getElementById("invoiceTourCard")?.offsetHeight||190;if(r.top<90||r.bottom>innerHeight-ch-30)el.scrollIntoView({behavior:"auto",block:"center"});}
+   cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>raf=requestAnimationFrame(pos));
+  });
+ }
+ window.startInvoiceTour=function(){closeUserGuide();if(typeof showV37Page==="function")showV37Page("invoiceCenter");idx=0;document.body.classList.add("new-record-tour-open");const o=document.getElementById("invoiceTourOverlay");o.classList.add("open");o.setAttribute("aria-hidden","false");requestAnimationFrame(()=>requestAnimationFrame(render));};
+ window.invoiceTourNext=function(){if(idx>=steps.length-1){endInvoiceTour();return;}idx++;render();};
+ window.invoiceTourPrev=function(){if(idx>0){idx--;render();}};
+ window.endInvoiceTour=function(){const o=document.getElementById("invoiceTourOverlay");if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}document.body.classList.remove("new-record-tour-open");};
+ window.addEventListener("resize",()=>{if(document.getElementById("invoiceTourOverlay")?.classList.contains("open"))pos();});
+})();
+</script>
+<script id="v37-60-customer-tour-js">
+(function(){
+ let idx=0,raf=0;
+ const steps=[
+  ["客戶資料庫","常用客戶可以先建立在這裡，之後新增請款會更快。"],
+  ["新增客戶","第一次使用時，按「＋ 新增客戶」建立公司資料。教學不會真的新增資料。"],
+  ["搜尋客戶","客戶多的時候，可以用公司名稱、統編、聯絡人或電話快速搜尋。"],
+  ["客戶資料","已建立的客戶會顯示成卡片，方便查看與管理。"],
+  ["查看詳情","按「查看詳情」可以看這位客戶的資料與歷史工作。教學不會替你按。"],
+  ["帶入請款","按「帶入請款」會直接帶入客戶名稱與統編，開始新增請款。教學不會替你按。"],
+  ["修改客戶","資料有變更時，可以按「修改」更新客戶資料。"],
+  ["刪除客戶","不再使用的客戶可以按「刪除」。實際刪除時系統會再次確認。"]
+ ];
+ function target(){
+  if(idx===0)return document.querySelector("#customerMaster .section-head")||document.getElementById("customerMaster");
+  if(idx===1)return document.querySelector("#customerMaster .section-head button[onclick*='openCustomerMasterForm']");
+  if(idx===2)return document.getElementById("customerMasterSearch");
+  const item=document.querySelector("#customerMasterList .customer-master-item");
+  if(idx===3)return item;
+  if(!item)return null;
+  const buttons=[...item.querySelectorAll("button")];
+  if(idx===4)return buttons.find(b=>b.textContent.includes("查看詳情"));
+  if(idx===5)return buttons.find(b=>b.textContent.includes("帶入請款"));
+  if(idx===6)return buttons.find(b=>b.textContent.includes("修改"));
+  if(idx===7)return buttons.find(b=>b.textContent.includes("刪除"));
+  return null;
+ }
+ function pos(){
+  const spot=document.getElementById("customerTourSpotlight"),card=document.getElementById("customerTourCard"),el=target();
+  if(!spot||!card)return;
+  if(!el){spot.style.display="none";card.style.top=Math.max(110,(innerHeight-card.offsetHeight)/2)+"px";return;}
+  spot.style.display="block";const r=el.getBoundingClientRect(),p=8,l=Math.max(7,r.left-p),t=Math.max(7,r.top-p);
+  spot.style.left=l+"px";spot.style.top=t+"px";spot.style.width=Math.max(44,Math.min(innerWidth-l-7,r.width+p*2))+"px";spot.style.height=Math.max(44,Math.min(innerHeight-t-7,r.height+p*2))+"px";
+  const ch=card.offsetHeight||190,g=14;card.style.top=(r.bottom+g+ch<=innerHeight-12)?(r.bottom+g)+"px":(r.top-ch-g>=12?(r.top-ch-g)+"px":Math.max(12,innerHeight-ch-18)+"px");
+ }
+ function render(){
+  requestAnimationFrame(()=>{
+   const s=steps[idx],el=target();
+   document.getElementById("customerTourProgress").textContent="步驟 "+(idx+1)+" / "+steps.length;
+   document.getElementById("customerTourTitle").textContent=s[0];
+   let txt=s[1];
+   if(!el&&idx>=3)txt="目前還沒有客戶資料可示範。先完成新增第一位客戶後，這一步就會直接框出實際位置。";
+   document.getElementById("customerTourText").textContent=txt;
+   document.getElementById("customerTourPrev").disabled=idx===0;
+   document.getElementById("customerTourNext").textContent=idx===steps.length-1?"完成":"下一步";
+   if(el){const r=el.getBoundingClientRect(),ch=document.getElementById("customerTourCard")?.offsetHeight||190;if(r.top<90||r.bottom>innerHeight-ch-30)el.scrollIntoView({behavior:"auto",block:"center"});}
+   cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>raf=requestAnimationFrame(pos));
+  });
+ }
+ window.startCustomerTour=function(){closeUserGuide();if(typeof showV37Page==="function")showV37Page("customerMaster");if(typeof renderCustomerMaster==="function")renderCustomerMaster();idx=0;document.body.classList.add("new-record-tour-open");const o=document.getElementById("customerTourOverlay");o.classList.add("open");o.setAttribute("aria-hidden","false");requestAnimationFrame(()=>requestAnimationFrame(render));};
+ window.customerTourNext=function(){if(idx>=steps.length-1){endCustomerTour();return;}idx++;render();};
+ window.customerTourPrev=function(){if(idx>0){idx--;render();}};
+ window.endCustomerTour=function(){const o=document.getElementById("customerTourOverlay");if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}document.body.classList.remove("new-record-tour-open");};
+ window.addEventListener("resize",()=>{if(document.getElementById("customerTourOverlay")?.classList.contains("open"))pos();});
+})();
+</script>
+<script id="v37-61-other-tour-js">
+(function(){
+ let idx=0,raf=0;
+ const steps=[
+  ["每月工作","這裡可以查看整個月份的工作安排；新增請款後，工作會依日期自動出現在月曆。"],
+  ["切換月份","用「上月／今天／下月」快速切換要查看的月份。"],
+  ["支出","油資、過路費或其他營運支出，都可以在這裡記錄。"],
+  ["新增支出","填好日期、支出項目與金額後，再按「＋ 新增支出」。教學不會替你新增資料。"],
+  ["本月收支","這裡會自動整理本月收入、稅金、匯款、現金、簽帳、支出與結餘。"],
+  ["更多設定","「更多」裡可以更改工程行名稱、管理車種，也可以再次開啟使用說明。"],
+  ["工程行名稱","需要更換帳本、PDF與匯出檔案顯示的名稱時，從這裡設定。教學不會修改名稱。"],
+  ["車種管理","不同使用者需要不同車種時，可以從這裡新增或管理車種。教學不會修改車種。"]
+ ];
+ let currentPage="";
+ function openPage(id){
+  if(currentPage===id)return;
+  currentPage=id;
+  if(typeof showV37Page==="function")showV37Page(id);
+  // showV37Page 內原本有 smooth scroll；教學定位時立即取消，
+  // 避免 iPhone Safari 在捲動途中把框框留在上一個位置。
+  window.scrollTo({top:0,behavior:"auto"});
+ }
+ function prep(){
+  if(typeof closeBottomMore==="function") closeBottomMore();
+  const sheet=document.getElementById("bottomMoreSheet");
+  if(sheet) sheet.style.zIndex="";
+  if(idx<=1) openPage("monthlyWork");
+  else if(idx<=3) openPage("expenses");
+  else if(idx===4) openPage("finance");
+  else if(idx>=5){
+    currentPage="";
+    if(typeof openBottomMore==="function") openBottomMore();
+    if(sheet) sheet.style.zIndex="11999";
+  }
+ }
+ function target(){
+  if(idx===0)return document.querySelector("#monthlyWork .calendar-head")||document.getElementById("monthlyWork");
+  if(idx===1)return document.querySelector("#monthlyWork .calendar-month-actions");
+  if(idx===2)return document.querySelector("#expenses .finance-head")||document.querySelector("#expenses .finance-title")||document.getElementById("expenses");
+  if(idx===3)return document.querySelector("#expenses button[onclick*='addExpense']")||document.querySelector("#expenses .expense-form");
+  if(idx===4)return document.querySelector("#finance .finance-v26-grid")||document.getElementById("finance");
+  if(idx===5)return document.querySelector("#bottomMoreSheet .bottom-more-sheet");
+  if(idx===6)return document.querySelector("#bottomMoreSheet button[onclick*=\"bottomMoreAction('business')\"]");
+  if(idx===7)return document.querySelector("#bottomMoreSheet button[onclick*=\"bottomMoreAction('vehicle')\"]");
+  return null;
+ }
+ function pos(){
+  const spot=document.getElementById("otherTourSpotlight"),card=document.getElementById("otherTourCard"),el=target();
+  if(!spot||!card)return;
+  if(!el){spot.style.display="none";card.style.top=Math.max(110,(innerHeight-card.offsetHeight)/2)+"px";return;}
+  spot.style.display="block";const r=el.getBoundingClientRect(),p=8,l=Math.max(7,r.left-p),t=Math.max(7,r.top-p);
+  spot.style.left=l+"px";spot.style.top=t+"px";spot.style.width=Math.max(44,Math.min(innerWidth-l-7,r.width+p*2))+"px";spot.style.height=Math.max(44,Math.min(innerHeight-t-7,r.height+p*2))+"px";
+  const ch=card.offsetHeight||190,g=14;
+  card.style.top=(r.bottom+g+ch<=innerHeight-12)?(r.bottom+g)+"px":(r.top-ch-g>=12?(r.top-ch-g)+"px":Math.max(12,innerHeight-ch-18)+"px");
+ }
+ function render(){
+  prep();
+  requestAnimationFrame(()=>{
+   const s=steps[idx],el=target();
+   document.getElementById("otherTourProgress").textContent="步驟 "+(idx+1)+" / "+steps.length;
+   document.getElementById("otherTourTitle").textContent=s[0];
+   document.getElementById("otherTourText").textContent=s[1];
+   document.getElementById("otherTourPrev").disabled=idx===0;
+   document.getElementById("otherTourNext").textContent=idx===steps.length-1?"完成":"下一步";
+   if(el && idx<5){const r=el.getBoundingClientRect(),ch=document.getElementById("otherTourCard")?.offsetHeight||190;if(r.top<90||r.bottom>innerHeight-ch-30)el.scrollIntoView({behavior:"auto",block:"center"});}
+   cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>raf=requestAnimationFrame(pos));
+  });
+ }
+ window.startOtherTour=function(){
+  closeUserGuide();idx=0;currentPage="";document.body.classList.add("new-record-tour-open");
+  const o=document.getElementById("otherTourOverlay");o.classList.add("open");o.setAttribute("aria-hidden","false");
+  requestAnimationFrame(()=>requestAnimationFrame(render));
+ };
+ window.otherTourNext=function(){if(idx>=steps.length-1){endOtherTour();return;}idx++;render();};
+ window.otherTourPrev=function(){if(idx>0){idx--;render();}};
+ window.endOtherTour=function(){
+  const o=document.getElementById("otherTourOverlay");if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}
+  if(typeof closeBottomMore==="function") closeBottomMore();
+  const sheet=document.getElementById("bottomMoreSheet");if(sheet)sheet.style.zIndex="";
+  document.body.classList.remove("new-record-tour-open");
+ };
+ window.addEventListener("resize",()=>{if(document.getElementById("otherTourOverlay")?.classList.contains("open"))pos();});
+})();
+</script>
+<script id="v37-63-first-use-tour-js">
+(function(){
+ let idx=0,raf=0,currentPage="";
+ const steps=[
+  ["歡迎使用吊車帳本","第一次使用只要完成幾個基本設定，就可以開始建立請款。"],
+  ["設定工程行名稱","先設定自己的工程行名稱，之後首頁、客戶帳本與匯出檔案都會使用這個名稱。教學不會修改資料。"],
+  ["設定車種","接著建立自己常用的吊車車種，新增請款時就能直接選擇。教學不會修改資料。"],
+  ["建立第一位客戶","把常用客戶先建立在客戶資料庫，之後新增請款時可以快速帶入。"],
+  ["新增第一筆請款","最後到新增請款，填入工作日期、內容、車種、金額與付款方式。"],
+  ["設定完成","基本設定完成後，就可以開始使用吊車帳本。之後需要更詳細的功能介紹，可以回到「使用說明」查看各項互動教學。"]
+ ];
+ function closeMore(){
+  if(typeof closeBottomMore==="function")closeBottomMore();
+  const sheet=document.getElementById("bottomMoreSheet");if(sheet)sheet.style.zIndex="";
+ }
+ function prep(){
+  closeMore();
+  if(idx===0||idx===5){
+    currentPage="";
+    if(typeof showV37Page==="function")showV37Page("home");
+    window.scrollTo({top:0,behavior:"auto"});
+  }else if(idx===1||idx===2){
+    currentPage="";
+    if(typeof openBottomMore==="function")openBottomMore();
+    const sheet=document.getElementById("bottomMoreSheet");if(sheet)sheet.style.zIndex="11999";
+  }else if(idx===3){
+    if(currentPage!=="customerMaster"){currentPage="customerMaster";if(typeof showV37Page==="function")showV37Page("customerMaster");if(typeof renderCustomerMaster==="function")renderCustomerMaster();window.scrollTo({top:0,behavior:"auto"});}
+  }else if(idx===4){
+    if(currentPage!=="newRecord"){currentPage="newRecord";if(typeof showV37Page==="function")showV37Page("newRecord");window.scrollTo({top:0,behavior:"auto"});}
+  }
+ }
+ function target(){
+  if(idx===0)return document.querySelector("#dashboard")||document.querySelector("header");
+  if(idx===1)return document.querySelector("#bottomMoreSheet button[onclick*=\"bottomMoreAction('business')\"]");
+  if(idx===2)return document.querySelector("#bottomMoreSheet button[onclick*=\"bottomMoreAction('vehicle')\"]");
+  if(idx===3)return document.querySelector("#customerMaster .section-head button[onclick*='openCustomerMasterForm']")||document.getElementById("customerMaster");
+  if(idx===4)return document.querySelector("#newRecord .section-head")||document.querySelector(".form-card")||document.getElementById("newRecord");
+  if(idx===5)return document.querySelector("#dashboard")||document.querySelector("header");
+  return null;
+ }
+ function pos(){
+  const spot=document.getElementById("firstUseTourSpotlight"),card=document.getElementById("firstUseTourCard"),el=target();
+  if(!spot||!card)return;
+  if(!el){spot.style.display="none";card.style.top=Math.max(110,(innerHeight-card.offsetHeight)/2)+"px";return;}
+  spot.style.display="block";const r=el.getBoundingClientRect(),p=8,l=Math.max(7,r.left-p),t=Math.max(7,r.top-p);
+  spot.style.left=l+"px";spot.style.top=t+"px";spot.style.width=Math.max(44,Math.min(innerWidth-l-7,r.width+p*2))+"px";spot.style.height=Math.max(44,Math.min(innerHeight-t-7,r.height+p*2))+"px";
+  const ch=card.offsetHeight||190,g=14;
+  card.style.top=(r.bottom+g+ch<=innerHeight-12)?(r.bottom+g)+"px":(r.top-ch-g>=12?(r.top-ch-g)+"px":Math.max(12,innerHeight-ch-18)+"px");
+ }
+ function render(){
+  prep();
+  requestAnimationFrame(()=>{
+   const s=steps[idx],el=target(),card=document.getElementById("firstUseTourCard");
+   document.getElementById("firstUseTourProgress").textContent="步驟 "+(idx+1)+" / "+steps.length;
+   document.getElementById("firstUseTourTitle").textContent=s[0];
+   document.getElementById("firstUseTourText").textContent=s[1];
+   document.getElementById("firstUseTourPrev").disabled=idx===0;
+   document.getElementById("firstUseTourNext").textContent=idx===steps.length-1?"完成":"下一步";
+   if(el&&idx!==1&&idx!==2){const r=el.getBoundingClientRect(),ch=card?.offsetHeight||190;if(r.top<90||r.bottom>innerHeight-ch-30)el.scrollIntoView({behavior:"auto",block:"center"});}
+   cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>raf=requestAnimationFrame(pos));
+  });
+ }
+ window.startFirstUseTour=function(){
+  closeUserGuide();idx=0;currentPage="";document.body.classList.add("new-record-tour-open");
+  const o=document.getElementById("firstUseTourOverlay");o.classList.add("open");o.setAttribute("aria-hidden","false");
+  requestAnimationFrame(()=>requestAnimationFrame(render));
+ };
+ window.firstUseTourNext=function(){if(idx>=steps.length-1){endFirstUseTour();return;}idx++;render();};
+ window.firstUseTourPrev=function(){if(idx>0){idx--;render();}};
+ window.endFirstUseTour=function(){
+  const o=document.getElementById("firstUseTourOverlay");if(o){o.classList.remove("open");o.setAttribute("aria-hidden","true");}
+  closeMore();document.body.classList.remove("new-record-tour-open");
+ };
+ window.addEventListener("resize",()=>{if(document.getElementById("firstUseTourOverlay")?.classList.contains("open"))pos();});
+})();
+</script>
 </body>
 </html>
